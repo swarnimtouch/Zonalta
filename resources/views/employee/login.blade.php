@@ -16,7 +16,6 @@
     <style>
         body {
             font-family: 'Poppins', sans-serif;
-            /* Same light blue gradient background */
             background: radial-gradient(circle at center, #dcedfb 0%, #b3d7f6 100%);
         }
 
@@ -46,12 +45,13 @@
             font-weight: 600;
         }
 
-        /* Custom Input Group to keep your specific icon design intact */
+        /* Custom Input Group */
         .icon-input-wrapper {
             position: relative;
         }
 
-        .icon-input-wrapper i {
+        /* Left Side Icons (ID & Lock) */
+        .icon-input-wrapper .left-icon {
             position: absolute;
             left: 15px;
             top: 50%;
@@ -60,15 +60,37 @@
             font-size: 14px;
         }
 
+        /* Right Side Eye Icon */
+        .icon-input-wrapper .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #204e8a;
+            font-size: 14px;
+            cursor: pointer;
+            z-index: 5;
+            transition: color 0.3s;
+        }
+
+        .icon-input-wrapper .toggle-password:hover {
+            color: #3461a3;
+        }
+
         .icon-input-wrapper .form-control {
-            padding-left: 45px; /* Space for the icon */
+            padding-left: 45px; /* Space for the left icon */
             font-size: 14px;
             border-color: #cbd5e1;
         }
 
+        /* Extra right padding specifically for password input so text doesn't overlap eye icon */
+        .icon-input-wrapper #password {
+            padding-right: 40px; 
+        }
+
         .icon-input-wrapper .form-control:focus {
             border-color: #204e8a;
-            box-shadow: 0 0 0 0.2rem rgba(32, 78, 138, 0.25); /* Bootstrap focus ring custom color */
+            box-shadow: 0 0 0 0.2rem rgba(32, 78, 138, 0.25);
         }
 
         .btn-submit {
@@ -86,7 +108,7 @@
 
         /* jQuery Validation Error Styling */
         label.error {
-            color: #dc3545; /* Bootstrap danger color */
+            color: #dc3545; 
             font-size: 12px;
             margin-top: 4px;
             display: block;
@@ -121,7 +143,7 @@
                 <div class="mb-3">
                     <label class="form-label" for="employee_code">Employee Code</label>
                     <div class="icon-input-wrapper">
-                        <i class="fa-solid fa-id-badge"></i>
+                        <i class="fa-solid fa-id-badge left-icon"></i>
                         <input type="text" name="employee_code" id="employee_code" class="form-control py-2" placeholder="Enter Employee Code">
                     </div>
                 </div>
@@ -129,8 +151,11 @@
                 <div class="mb-4">
                     <label class="form-label" for="password">Password</label>
                     <div class="icon-input-wrapper">
-                        <i class="fa-solid fa-lock"></i>
+                        <i class="fa-solid fa-lock left-icon"></i>
+                        
                         <input type="password" name="password" id="password" class="form-control py-2" placeholder="Enter Password">
+                        
+                        <i class="fa-solid fa-eye-slash toggle-password" title="Show/Hide Password"></i>
                     </div>
                 </div>
 
@@ -145,6 +170,24 @@
 
     <script>
         $(document).ready(function () {
+            
+            // Show/Hide Password Logic using jQuery
+            $(".toggle-password").click(function() {
+                // Swap the classes between fa-eye-slash and fa-eye
+                $(this).toggleClass("fa-eye-slash fa-eye");
+                
+                // Get the password input field
+                var input = $("#password");
+                
+                // Toggle the input type attribute
+                if (input.attr("type") === "password") {
+                    input.attr("type", "text"); // Password dikhega (icon open eye ban gaya hai)
+                } else {
+                    input.attr("type", "password"); // Password hide hoga (icon closed eye ban gaya hai)
+                }
+            });
+
+            // Form Validation Logic
             $("#loginForm").validate({
                 rules: {
                     employee_code: {
@@ -165,7 +208,6 @@
                     }
                 },
                 errorPlacement: function(error, element) {
-                    // Custom error placement under the wrapper div
                     error.insertAfter(element.parent(".icon-input-wrapper"));
                 }
             });
