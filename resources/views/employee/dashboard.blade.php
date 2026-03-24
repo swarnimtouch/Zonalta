@@ -216,8 +216,9 @@
     <div class="card">
         <h3>Create Poster</h3>
 
-        <form method="POST" action="{{ route('poster.store', $employee->id) }}">
-            @csrf
+        <form method="POST" action="{{ route('poster.store') }}">
+
+        @csrf
             <input type="hidden" name="cropped_image" id="cropped_image">
 
             {{-- Name + MSL Code --}}

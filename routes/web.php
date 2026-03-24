@@ -17,8 +17,9 @@ Route::post('/import-doctors', [ImportController::class, 'importDoctors'])->name
 Route::get('/', [EmployeeLoginController::class, 'showLogin'])->name('login');
 Route::post('/login', [EmployeeLoginController::class, 'login'])->name('login.submit');
 
-Route::get('/dashboard/{employee}', [EmployeeLoginController::class, 'dashboard'])->name('dashboard');
-Route::post('/employee/{employee_id}/poster', [EmployeeLoginController::class, 'storePoster'])->name('poster.store');
+Route::get('/dashboard', [EmployeeLoginController::class, 'dashboard'])->name('dashboard');
+Route::post('/employee/poster', [EmployeeLoginController::class, 'storePoster'])->name('poster.store');
+
 Route::get('/logout', [EmployeeLoginController::class, 'logout'])->name('logout');
 Route::get('/result/{poster}', [EmployeeLoginController::class, 'result'])->name('poster.result');
 Route::get('/download/banner/{id}', [EmployeeLoginController::class, 'downloadBanner'])->name('download.banner');

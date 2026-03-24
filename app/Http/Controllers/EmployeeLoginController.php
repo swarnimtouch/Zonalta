@@ -31,32 +31,48 @@ class EmployeeLoginController extends Controller
             return back()->with('error', 'Employee not found');
         }
 
-        return redirect()->route('dashboard', $employee->id);
+        session(['employee_id' => $employee->id]);
+
+        return redirect()->route('dashboard');
     }
 
-    public function dashboard($id)
+    public function dashboard()
     {
-        $employee = Employee::findOrFail($id);
+        $employee_id = session('employee_id');
+
+        if (!$employee_id) {
+            return redirect()->route('login');
+        }
+
+        $employee = Employee::findOrFail($employee_id);
 
         $poster = null;
-
-        if (request()->has('poster_id')) {
-            $poster = DoctorPoster::find(request()->poster_id);
+        // flash session se poster_id milega — sirf ek baar
+        if (session('poster_id')) {
+            $poster = DoctorPoster::find(session('poster_id'));
         }
 
         return view('employee.dashboard', compact('employee', 'poster'));
     }
 
+
     public function logout()
     {
+        session()->forget(['employee_id', 'poster_id']);
         return redirect()->route('login');
     }
 
     // ─────────────────────────────────────────────────────────────────
     //  GENERATE BANNER + VIDEO
     // ─────────────────────────────────────────────────────────────────
-    public function storePoster(Request $request, $employee_id)
+    public function storePoster(Request $request)
     {
+        $employee_id = session('employee_id');
+
+        if (!$employee_id) {
+            return redirect()->route('login');
+        }
+
         $request->validate([
             'name'       => 'required',
             'phone'      => 'required',
@@ -70,11 +86,10 @@ class EmployeeLoginController extends Controller
         $doctorName = $this->cleanName($request->name);
 
         // ── Photo ──────────────────────────────────────────────────
-        $photoPath    = null;   // local temp path (public_path relative)
-        $photoS3Path  = null;   // S3 path stored in DB
+        $photoPath   = null;
+        $photoS3Path = null;
 
         if ($request->cropped_image) {
-            // Save photo locally (temp) — needed for banner generation
             $localPhotoFolder = $this->makeLocalTempPath('photos');
             $imageName        = $doctorName . '_photo.png';
             $localPhotoFull   = $localPhotoFolder . '/' . $imageName;
@@ -82,15 +97,12 @@ class EmployeeLoginController extends Controller
             $image = str_replace('data:image/png;base64,', '', $request->cropped_image);
             $image = str_replace(' ', '+', $image);
             file_put_contents($localPhotoFull, base64_decode($image));
-            $positionCode = $employee->position_code ?? 'unknown';
 
-            // Upload photo to S3: Zonalta/{emp_id}/photos/
-            $s3PhotoKey  = "Zonalta/Employee_{$positionCode}/photos/{$imageName}";
+            $positionCode = $employee->position_code ?? 'unknown';
+            $s3PhotoKey   = "Zonalta/Employee_{$positionCode}/photos/{$imageName}";
             Storage::disk('s3')->put($s3PhotoKey, file_get_contents($localPhotoFull), 'public');
             $photoS3Path = $s3PhotoKey;
-
-            // Keep local temp path for banner step
-            $photoPath = $localPhotoFull;
+            $photoPath   = $localPhotoFull;
         }
 
         // ── Banner ────────────────────────────────────────────────
@@ -116,7 +128,7 @@ class EmployeeLoginController extends Controller
             @unlink($photoPath);
         }
 
-        // ── Save (store S3 paths in DB) ───────────────────────────
+        // ── Save to DB ────────────────────────────────────────────
         $poster = DoctorPoster::create([
             'employee_id' => $employee_id,
             'name'        => $request->name,
@@ -129,21 +141,17 @@ class EmployeeLoginController extends Controller
             'video_path'  => $videoS3Path,
         ]);
 
-        return redirect()->route('dashboard', [
-            'employee'  => $employee_id,
-            'poster_id' => $poster->id,
-            
-        ]);
+        // Poster ID session mein save — URL nahi badlegi
+        session()->flash('poster_id', $poster->id);
+
+
+        return redirect()->route('dashboard');
     }
 
     // ═════════════════════════════════════════════════════════════════
     //  HELPERS
     // ═════════════════════════════════════════════════════════════════
 
-    /**
-     * Create a local TEMP folder under storage/app/temp/
-     * (used only during processing — files deleted after S3 upload)
-     */
     private function makeLocalTempPath($type)
     {
         $path = storage_path("app/temp/{$type}");
@@ -161,11 +169,10 @@ class EmployeeLoginController extends Controller
     // ─────────────────────────────────────────────────────────────────
     //  BANNER GENERATOR
     // ─────────────────────────────────────────────────────────────────
-    /**
-     * Returns [localBannerFullPath, s3BannerKey]
-     */
     private function generateBanner($request, $photoLocalPath, $employee_id, $doctorName)
     {
+        $employee = Employee::findOrFail($employee_id);
+
         $folder         = $this->makeLocalTempPath('banners');
         $bannerName     = $doctorName . '_banner.jpg';
         $bannerFullPath = $folder . '/' . $bannerName;
@@ -176,9 +183,9 @@ class EmployeeLoginController extends Controller
 
             $photo = imagecreatefromstring(file_get_contents($photoLocalPath));
 
-            $size   = 250;
-            $x      = 300;
-            $y      = 300;
+            $size = 250;
+            $x    = 300;
+            $y    = 300;
 
             $circle = imagecreatetruecolor($size, $size);
             imagesavealpha($circle, true);
@@ -217,28 +224,19 @@ class EmployeeLoginController extends Controller
         imagedestroy($background);
 
         $positionCode = $employee->position_code ?? 'unknown';
-
-        // Upload banner to S3: Zonalta/{emp_id}/banners/
-        $s3Key = "Zonalta/Employee_{$positionCode}/banners/{$bannerName}";
+        $s3Key        = "Zonalta/Employee_{$positionCode}/banners/{$bannerName}";
         Storage::disk('s3')->put($s3Key, file_get_contents($bannerFullPath), 'public');
 
         return [$bannerFullPath, $s3Key];
     }
 
     // ─────────────────────────────────────────────────────────────────
-    //  VIDEO GENERATOR  (AUDIO FIX INCLUDED)
+    //  VIDEO GENERATOR
     // ─────────────────────────────────────────────────────────────────
-    /**
-     * Returns [localVideoFullPath, s3VideoKey]
-     *
-     * AUDIO FIX:
-     *  - Base video ka audio stream map kiya hai (-map 0:a?)
-     *  - Banner ke 5 sec ke liye silent audio generate kiya hai (anullsrc)
-     *  - Dono audio concat ke saath merge kiya hai
-     *  - Agar base video mein audio nahi hai, toh bhi crash nahi hoga (0:a? = optional)
-     */
     private function generateVideo($videoType, $bannerLocalPath, $employee_id, $doctorName)
     {
+        $employee = Employee::findOrFail($employee_id);
+
         $folder    = $this->makeLocalTempPath('videos');
         $baseVideo = $videoType === 'Video1'
             ? public_path('uploads/base_videos/Video1.mp4')
@@ -266,24 +264,14 @@ class EmployeeLoginController extends Controller
             ? round((int)$fpsParts[0] / (int)$fpsParts[1])
             : 25;
 
-        // ── Detect audio sample rate from base video ──────────────
-        $arCmd  = "ffprobe -v error -select_streams a:0 "
+        // ── Detect audio sample rate ──────────────────────────────
+        $arCmd = "ffprobe -v error -select_streams a:0 "
             . "-show_entries stream=sample_rate "
             . "-of default=noprint_wrappers=1:nokey=1 \"{$baseVideo}\" 2>&1";
-        $arRaw  = trim(shell_exec($arCmd));
-        $ar     = (is_numeric($arRaw) && (int)$arRaw > 0) ? (int)$arRaw : 44100;
+        $arRaw = trim(shell_exec($arCmd));
+        $ar    = (is_numeric($arRaw) && (int)$arRaw > 0) ? (int)$arRaw : 44100;
 
-        // ── FFmpeg command with AUDIO ─────────────────────────────
-        //
-        //  Inputs:
-        //    0 → base video  (video + audio)
-        //    1 → banner image (loop 5 sec)
-        //
-        //  filter_complex:
-        //    [1:v] → scale banner to video size          → [banner_v]
-        //    anullsrc → silent audio for 5 sec           → [banner_a]
-        //    concat base_video + banner (v+a both)       → [outv][outa]
-        //
+        // ── FFmpeg command ────────────────────────────────────────
         $cmd = "ffmpeg -y "
             . "-i \"{$baseVideo}\" "
             . "-loop 1 -t 5 -i \"{$bannerLocalPath}\" "
@@ -308,14 +296,17 @@ class EmployeeLoginController extends Controller
             ]);
             abort(500, 'Video generation failed: ' . implode("\n", $output));
         }
-        $positionCode = $employee->position_code ?? 'unknown';
 
-        // Upload video to S3: Zonalta/{emp_id}/videos/
-        $s3Key = "Zonalta/Employee_{$positionCode}/videos/{$finalName}";
+        $positionCode = $employee->position_code ?? 'unknown';
+        $s3Key        = "Zonalta/Employee_{$positionCode}/videos/{$finalName}";
         Storage::disk('s3')->put($s3Key, fopen($finalPath, 'r'), 'public');
 
         return [$finalPath, $s3Key];
     }
+
+    // ─────────────────────────────────────────────────────────────────
+    //  DOWNLOAD
+    // ─────────────────────────────────────────────────────────────────
     public function downloadBanner($id)
     {
         $poster = DoctorPoster::findOrFail($id);
