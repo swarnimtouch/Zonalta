@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use App\Imports\EmployeeImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
 
 class AdminController extends Controller
 {
@@ -63,16 +65,37 @@ class AdminController extends Controller
     {
         $banners = DoctorPoster::with('employee')
             ->when($request->search, function ($q) use ($request) {
-                $q->where('name', 'like', '%' . $request->search . '%')
-                    ->orWhere('degree', 'like', '%' . $request->search . '%')
-                    ->orWhere('phone', 'like', '%' . $request->search . '%')
-                    ->orWhere('address', 'like', '%' . $request->search . '%')
-                    ->orWhere('msl_code', 'like', '%' . $request->search . '%')
-                    ->orWhereHas('employee', function ($q2) use ($request) {
-                        $q2->where('employee_code', 'like', '%' . $request->search . '%');
-                    });
+                $q->where(function ($query) use ($request) {
+                    $query->where('name', 'like', '%' . $request->search . '%')
+                        ->orWhere('degree', 'like', '%' . $request->search . '%')
+                        ->orWhere('phone', 'like', '%' . $request->search . '%')
+                        ->orWhere('address', 'like', '%' . $request->search . '%')
+                        ->orWhere('msl_code', 'like', '%' . $request->search . '%')
+                        ->orWhereHas('employee', function ($q2) use ($request) {
+                            $q2->where('employee_code', 'like', '%' . $request->search . '%');
+                        });
+                });
             })
+            ->latest()
             ->paginate(10);
+
+        // 🔥 URLs generate here (important part)
+        $banners->getCollection()->transform(function ($banner) {
+
+            $banner->photo_url = $banner->photo
+                ? Storage::disk('s3')->url($banner->photo)
+                : null;
+
+            $banner->banner_url = $banner->banner_path
+                ? Storage::disk('s3')->url($banner->banner_path)
+                : null;
+
+            $banner->video_url = $banner->video_path
+                ? Storage::disk('s3')->url($banner->video_path)
+                : null;
+
+            return $banner;
+        });
 
         return view('admin.banner', compact('banners'));
     }

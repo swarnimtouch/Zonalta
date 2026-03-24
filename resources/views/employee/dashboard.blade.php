@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard — {{ $employee->name }}</title>
+    <title>Zonalta</title>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link  rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.5/croppie.min.css"/>
@@ -283,12 +283,12 @@
 
             {{-- Photo Crop --}}
             <div class="photo-section">
-                <label class="upload-label" for="upload">📷 Choose Photo</label>
+                <label class="upload-label" for="upload"> Choose Photo</label>
                 <input type="file" id="upload" accept="image/*">
 
                 <div id="crop-wrap">
                     <div id="crop-container"></div>
-                    <button type="button" id="crop-btn">✂️ Crop &amp; Confirm</button>
+                    <button type="button" id="crop-btn"> Crop &amp; Confirm</button>
                 </div>
 
                 <div id="crop-preview-wrap">
@@ -299,31 +299,32 @@
 
             {{-- Generate button --}}
             <button type="submit" class="btn-generate">
-                🚀 Generate Banner &amp; Video
+                Generate Banner &amp; Video
             </button>
 
         </form>
     </div>
 
     {{-- Download section --}}
-    @if(isset($poster) && $poster && $poster->banner_path)
-        <div class="download-card">
-            <h3>Download Files</h3>
-            <div class="download-row">
-
-                <a href="{{ asset($poster->banner_path) }}" download class="dl-btn dl-banner">
-                    ⬇️ Download Banner
-                </a>
-
-                @if($poster->video_path)
-                    <a href="{{ asset($poster->video_path) }}" download class="dl-btn dl-video">
-                        ⬇️ Download Video
+        @if(isset($poster) && $poster && $poster->banner_path)
+            <div class="download-card">
+                <h3>Download Files</h3>
+                <div class="download-row">
+                    <a href="{{ route('download.banner', $poster->id) }}"
+                       class="dl-btn dl-banner">
+                        Download Banner
                     </a>
-                @endif
 
+                    @if($poster->video_path)
+                        <a href="{{ route('download.video', $poster->id) }}"
+                           class="dl-btn dl-video">
+                            Download Video
+                        </a>
+                    @endif
+                </div>
             </div>
-        </div>
-    @endif
+        @endif
+
 
 </div>
 

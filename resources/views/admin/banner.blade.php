@@ -4,207 +4,7 @@
 @section('page-title', 'Banner')
 
 @push('styles')
-    <style>
-        /* ══════════════════════════════════════
-           MEDIA POPUP — Banner & Video
-        ══════════════════════════════════════ */
 
-        /* Overlay */
-        .media-modal-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: rgba(0, 0, 0, 0.82);
-            backdrop-filter: blur(6px);
-            -webkit-backdrop-filter: blur(6px);
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            animation: fadeIn 0.22s ease;
-        }
-        .media-modal-overlay.open {
-            display: flex;
-        }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* Box */
-        .media-modal-box {
-            position: relative;
-            background: #1a2035;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 18px;
-            padding: 28px 24px 22px;
-            width: 100%;
-            max-width: 520px;
-            box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-            animation: slideUp 0.28s cubic-bezier(.22,.68,0,1.2);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-        }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(28px) scale(0.96); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* Close */
-        .media-modal-close {
-            position: absolute;
-            top: 12px;
-            right: 14px;
-            background: rgba(255,255,255,0.07);
-            border: none;
-            border-radius: 50%;
-            width: 34px; height: 34px;
-            display: flex; align-items: center; justify-content: center;
-            color: #bbb;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.18s, color 0.18s;
-        }
-        .media-modal-close:hover { background: rgba(231,74,59,0.25); color: #e74a3b; }
-
-        /* Type badge tabs */
-        .media-modal-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 2px;
-            align-self: flex-start;
-        }
-        .media-tab-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.10);
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: #8899bb;
-            cursor: pointer;
-            transition: background 0.18s, color 0.18s, border-color 0.18s;
-        }
-        .media-tab-badge.active-banner  { background: rgba(78,115,223,0.18); border-color: rgba(78,115,223,0.45); color: #7ea7f8; }
-        .media-tab-badge.active-video   { background: rgba(28,200,138,0.15); border-color: rgba(28,200,138,0.40); color: #1cc88a; }
-
-        /* Media wrap */
-        #mediaContent {
-            width: 100%;
-            border-radius: 12px;
-            overflow: hidden;
-            background: rgba(0,0,0,0.3);
-            min-height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        #mediaContent img {
-            width: 100%;
-            max-height: 340px;
-            object-fit: contain;
-            display: block;
-            border-radius: 12px;
-        }
-        #mediaContent video {
-            width: 100%;
-            max-height: 320px;
-            border-radius: 12px;
-            background: #000;
-            display: block;
-            outline: none;
-        }
-
-        /* Info */
-        .media-modal-name {
-            font-size: 1rem;
-            font-weight: 700;
-            color: #e8eaf6;
-            letter-spacing: 0.01em;
-            text-align: center;
-        }
-        .media-modal-empid {
-            font-size: 0.76rem;
-            color: #6b7eaa;
-            text-align: center;
-            margin-top: -8px;
-        }
-
-        /* Download buttons */
-        .media-dl-row {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-            margin-top: 2px;
-        }
-        .media-dl-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 9px 20px;
-            border-radius: 10px;
-            font-size: 0.82rem;
-            font-weight: 600;
-            text-decoration: none;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.18s, transform 0.15s;
-        }
-        .media-dl-btn:hover { opacity: 0.85; transform: translateY(-1px); }
-        .media-dl-btn:active { transform: scale(0.97); }
-        .btn-dl-banner {
-            background: linear-gradient(135deg, #4e73df, #2d5be3);
-            color: #fff;
-        }
-        .btn-dl-video {
-            background: linear-gradient(135deg, #1cc88a, #13a870);
-            color: #fff;
-        }
-        .btn-dl-disabled {
-            background: rgba(255,255,255,0.06);
-            color: rgba(255,255,255,0.25);
-            cursor: not-allowed;
-            pointer-events: none;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-
-        /* ══════════════════════════════════════
-           MOBILE CARDS — extra fields
-        ══════════════════════════════════════ */
-        .m-media-btns {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            padding: 10px 14px 0;
-        }
-        .m-media-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 7px 14px;
-            border-radius: 8px;
-            font-size: 0.76rem;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: opacity 0.18s, transform 0.15s;
-        }
-        .m-media-btn:hover { opacity: 0.85; transform: translateY(-1px); }
-        .m-btn-banner { background: rgba(78,115,223,0.18); border: 1px solid rgba(78,115,223,0.35); color: #7ea7f8; }
-        .m-btn-video  { background: rgba(28,200,138,0.15); border: 1px solid rgba(28,200,138,0.35); color: #1cc88a; }
-        .m-btn-disabled { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); color: rgba(255,255,255,0.22); cursor: not-allowed; }
-
-        /* Desktop action column — banner & video buttons */
-        .act-btn.banner-btn  { background: rgba(78,115,223,0.15); border: 1px solid rgba(78,115,223,0.3); color: #7ea7f8; }
-        .act-btn.video-btn   { background: rgba(28,200,138,0.12); border: 1px solid rgba(28,200,138,0.28); color: #1cc88a; }
-        .act-btn.media-disabled { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); color: rgba(255,255,255,0.2); cursor: not-allowed; }
-    </style>
 @endpush
 
 @section('content')
@@ -265,12 +65,15 @@
                 </thead>
                 <tbody>
                 @forelse($banners as $index => $banner)
+
                     @php
-                        $colors     = ['c1','c2','c3','c4','c5'];
-                        $c          = $colors[$index % 5];
-                        $photoUrl   = $banner->photo  ? asset($banner->photo)  : null;
-                        $bannerUrl  = $banner->banner_path ? asset($banner->banner_path) : null;
-                        $videoUrl   = $banner->video_path   ? asset($banner->video_path)   : null;
+
+
+                            $colors     = ['c1','c2','c3','c4','c5'];
+                            $c          = $colors[$index % 5];
+                            $photoUrl  = $banner->photo_url;
+                            $bannerUrl = $banner->banner_url;
+                            $videoUrl  = $banner->video_url;
                     @endphp
                     <tr>
                         <td class="serial-cell">{{ $banners->firstItem() + $index }}</td>
@@ -312,7 +115,16 @@
                                 @if($bannerUrl)
                                     <button type="button"
                                             class="act-btn banner-btn"
-                                            onclick="openMediaModal('banner', null, '{{ $bannerUrl }}', '{{ addslashes($banner->name) }}', '{{ $banner->employee->employee_code ?? '' }}')"
+                                            onclick="openMediaModal(
+                                                    'banner',
+                                                    null,
+                                                    '{{ $bannerUrl }}',
+                                                    '{{ addslashes($banner->name) }}',
+                                                    '{{ $banner->employee->employee_code ?? '' }}',
+                                                    null,
+                                                    '{{ $banner->id }}',
+                                                    null
+                                                )"
                                             title="View Banner">
                                         <i class="fas fa-image"></i>
                                     </button>
@@ -326,7 +138,16 @@
                                 @if($videoUrl)
                                     <button type="button"
                                             class="act-btn video-btn"
-                                            onclick="openMediaModal('video', null, null, '{{ addslashes($banner->name) }}', '{{ $banner->employee->employee_code ?? '' }}', '{{ $videoUrl }}')"
+                                            onclick="openMediaModal(
+                                            'video',
+                                            null,
+                                            null,
+                                            '{{ addslashes($banner->name) }}',
+                                            '{{ $banner->employee->employee_code ?? '' }}',
+                                            '{{ $videoUrl }}',
+                                            null,
+                                            '{{ $banner->id }}'
+                                            )"
                                             title="View Video">
                                         <i class="fas fa-video"></i>
                                     </button>
@@ -400,9 +221,9 @@
             @php
                 $colors    = ['c1','c2','c3','c4','c5'];
                 $c         = $colors[$index % 5];
-                $photoUrl  = $banner->photo         ? asset($banner->photo)         : null;
-                $bannerUrl = $banner->banner_path  ? asset($banner->banner_path)  : null;
-                $videoUrl  = $banner->video_path   ? asset($banner->video_path)   : null;
+                $photoUrl  = $banner->photo_url;
+                $bannerUrl = $banner->banner_url;
+                $videoUrl  = $banner->video_url;
             @endphp
 
             <div class="m-card" style="animation-delay:{{ $index * 0.04 }}s;">
@@ -430,7 +251,16 @@
                     @if($bannerUrl)
                         <button type="button"
                                 class="m-media-btn m-btn-banner"
-                                onclick="openMediaModal('banner', null, '{{ $bannerUrl }}', '{{ addslashes($banner->name) }}', '{{ $banner->employee->employee_code ?? '' }}')">
+                                onclick="openMediaModal(
+                                    'banner',
+                                    null,
+                                    '{{ $bannerUrl }}',
+                                    '{{ addslashes($banner->name) }}',
+                                    '{{ $banner->employee->employee_code ?? '' }}',
+                                    null,
+                                    '{{ $banner->id }}',
+                                    null
+                                )">
                             <i class="fas fa-image"></i> View Banner
                         </button>
                     @else
@@ -442,7 +272,16 @@
                     @if($videoUrl)
                         <button type="button"
                                 class="m-media-btn m-btn-video"
-                                onclick="openMediaModal('video', null, null, '{{ addslashes($banner->name) }}', '{{ $banner->employee->employee_code ?? '' }}', '{{ $videoUrl }}')">
+                                onclick="openMediaModal(
+                                'video',
+                                null,
+                                null,
+                                '{{ addslashes($banner->name) }}',
+                                '{{ $banner->employee->employee_code ?? '' }}',
+                                '{{ $videoUrl }}',
+                                null,
+                                '{{ $banner->id }}'
+                            )">
                             <i class="fas fa-video"></i> View Video
                         </button>
                     @else
@@ -583,7 +422,10 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script>
+        const downloadBannerRoute = "{{ route('download.banner', ':id') }}";
+        const downloadVideoRoute  = "{{ route('download.video', ':id') }}";
+    </script>
     <script>
         // ══════════════════════════════════════════════════════════
         //  UNIFIED MEDIA MODAL
@@ -594,7 +436,7 @@
         //  empCode    – employee code
         //  videoUrl   – video file  (uploads/EMP001/videos/...)
         // ══════════════════════════════════════════════════════════
-        function openMediaModal(type, photoUrl, bannerUrl, name, empCode, videoUrl) {
+        function openMediaModal(type, photoUrl, bannerUrl, name, empCode, videoUrl, bannerId, videoId) {
             const modal    = document.getElementById('mediaModal');
             const content  = document.getElementById('mediaContent');
             const tabs     = document.getElementById('mediaTabs');
@@ -629,14 +471,14 @@
                     content.innerHTML = `<img src="${bannerUrl}" alt="${name}" onerror="this.replaceWith(noMediaPlaceholder('image'))">`;
 
                     // Filename from path
-                    const bannerFilename = bannerUrl.split('/').pop() || 'banner.jpg';
+                    const downloadUrl = downloadBannerRoute.replace(':id', bannerId);
+
                     dlRow.innerHTML = `
-                    <a href="${bannerUrl}"
-                       download="${bannerFilename}"
-                       class="media-dl-btn btn-dl-banner"
-                       title="Download Banner Image">
-                        <i class="fas fa-download"></i> Download Banner
-                    </a>`;
+            <a href="${downloadUrl}"
+               class="media-dl-btn btn-dl-banner">
+               <i class="fas fa-download"></i> Download Banner
+            </a>
+        `;
                 } else {
                     content.appendChild(noMediaPlaceholder('image'));
                 }
@@ -670,14 +512,15 @@
 
                     content.appendChild(vid);
 
-                    const videoFilename = videoUrl.split('/').pop() || 'video.mp4';
+                    const downloadUrl = downloadVideoRoute.replace(':id', videoId);
+
                     dlRow.innerHTML = `
-                    <a href="${videoUrl}"
-                       download="${videoFilename}"
-                       class="media-dl-btn btn-dl-video"
-                       title="Download Video">
-                        <i class="fas fa-download"></i> Download Video
-                    </a>`;
+            <a href="${downloadUrl}"
+               class="media-dl-btn btn-dl-video">
+               <i class="fas fa-download"></i> Download Video
+            </a>
+        `;
+
                 } else {
                     content.appendChild(noMediaPlaceholder('video'));
                 }
