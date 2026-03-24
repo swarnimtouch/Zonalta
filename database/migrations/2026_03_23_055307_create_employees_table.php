@@ -15,8 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('employee_code');
-            $table->string('position_code');
-            $table->string('user_position_code');
+            $table->string('position_code')->nullable();
             $table->string('designation');
             $table->string('hq_name');
             $table->string('hq_code');

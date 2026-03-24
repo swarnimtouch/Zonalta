@@ -14,7 +14,6 @@ class EmployeeImport implements ToModel, WithHeadingRow
             'name' => $row['name'],
             'employee_code' => $row['employee_code'],
             'position_code' => $row['position_code'],
-            'user_position_code' => $row['user_position_code'],
             'designation' => $row['designation'],
             'hq_name' => $row['hq_name'],
             'hq_code' => $row['hq_code'],
