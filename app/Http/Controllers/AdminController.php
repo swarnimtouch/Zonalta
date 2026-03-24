@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\BannerExport;
 use App\Exports\DoctorExport;
+use App\Exports\EmployeeExport;
 use App\Models\Doctor;
 use App\Models\DoctorPoster;
 use App\Models\Employee;
@@ -112,7 +114,7 @@ class AdminController extends Controller
     public function banner_export(Request $request)
     {
         return Excel::download(
-            new DoctorExport($request->search),
+            new BannerExport($request->search),
             'banner.xlsx'
         );
     }
