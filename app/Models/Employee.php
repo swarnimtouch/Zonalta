@@ -11,7 +11,6 @@ class Employee extends Model
         'name',
         'employee_code',
         'position_code',
-        'user_position_code',
         'designation',
         'hq_name',
         'hq_code'
