@@ -150,7 +150,7 @@
             color: #204e8a;
             font-size: 14px;
         }
-        .icon-input-wrapper textarea ~ i, 
+        .icon-input-wrapper textarea ~ i,
         .icon-input-wrapper i.fa-location-dot {
             top: 20px;
         }
@@ -244,8 +244,8 @@
             cursor: pointer;
             z-index: 2;
         }
-        #crop-wrap { 
-            display: none; 
+        #crop-wrap {
+            display: none;
             flex-direction: column;
             align-items: center;
             width: 100%;
@@ -253,16 +253,16 @@
             position: relative;
             z-index: 5;
         }
-        #crop-container { 
-            width: 100%; 
-            max-width: 300px; 
-            margin: 0 auto; 
+        #crop-container {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
         }
         .croppie-container {
             padding-bottom: 15px;
         }
         .cr-slider-wrap {
-            margin-bottom: 0 !important; 
+            margin-bottom: 0 !important;
             z-index: 10 !important;
         }
         #crop-btn {
@@ -440,6 +440,20 @@
             @csrf
             <input type="hidden" name="cropped_image" id="cropped_image">
             <div class="row mb-3">
+                <div class="col-md-12 mb-3 mb-md-0">
+                    <label class="form-label" for="prefix">Prefix</label>
+                    <div class="icon-input-wrapper">
+                        <i class="fa-solid fa-id-badge"></i>
+                        <select name="prefix" id="prefix" class="form-select">
+                            <option value="Dr." selected>Dr.</option>
+
+                        </select>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="row mb-3">
                 <div class="col-md-6 mb-3 mb-md-0">
                     <label class="form-label" for="name">Doctor Name</label>
                     <div class="icon-input-wrapper">
@@ -485,13 +499,13 @@
                     <label class="form-label d-block mb-3">Video Type</label>
                     <div class="d-flex gap-3">
                         <div class="radio-card">
-                            <input type="radio" name="video_type" id="bipolar1" value="Bipolar 1" class="d-none">
+                            <input type="radio" name="video_type" id="bipolar1" value="Video1" class="d-none">
                             <label for="bipolar1" class="radio-label">
                                  Bipolar 1
                             </label>
                         </div>
                         <div class="radio-card">
-                            <input type="radio" name="video_type" id="bipolar2" value="Bipolar 2" class="d-none">
+                            <input type="radio" name="video_type" id="bipolar2" value="Video2" class="d-none">
                             <label for="bipolar2" class="radio-label">
                                  Bipolar 2
                             </label>
@@ -554,30 +568,30 @@
         $('.profile-info').on('click', function(e) {
             if(window.innerWidth < 768) {
                 e.stopPropagation();
-                $(this).toggleClass('active'); 
+                $(this).toggleClass('active');
             }
         });
         $(document).on('click', function() {
             $('.profile-info').removeClass('active');
         });
         $('.profile-dropdown').on('click', function(e) {
-            e.stopPropagation(); 
+            e.stopPropagation();
         });
         $("#dashboardForm").validate({
-            ignore: "", 
+            ignore: "",
             rules: {
                 name: { required: true },
-                msl_code: { required: true }, 
+                msl_code: { required: true },
                 degree: { required: true },
-                phone: { 
+                phone: {
                     required: true,
-                    digits: true,     
+                    digits: true,
                     minlength: 10,
                     maxlength: 10
                 },
-                address: { required: true }, 
+                address: { required: true },
                 video_type: { required: true },
-                cropped_image: { required: true } 
+                cropped_image: { required: true }
             },
             messages: {
                 name: "Please enter the doctor's name",
@@ -598,14 +612,14 @@
                     error.insertAfter("#upload-box-wrapper");
                 } else if(element.attr("name") == "video_type") {
                     // Radio button ki error naye div me jayegi
-                    error.appendTo("#video_type_error"); 
+                    error.appendTo("#video_type_error");
                 } else {
                     error.insertAfter(element.closest(".icon-input-wrapper"));
                 }
             }
         });
         let cropper = null;
-        let originalImageSrc = null; 
+        let originalImageSrc = null;
         function initCropper(imageSrc) {
             $(".upload-content").hide();
             $("#crop-preview-wrap").hide();
@@ -636,18 +650,23 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onload = function (e) {
-                originalImageSrc = e.target.result; 
-                $("#cropped_image").val(""); 
+                originalImageSrc = e.target.result;
+                $("#cropped_image").val("");
                 initCropper(originalImageSrc);
             };
             reader.readAsDataURL(file);
         });
         $("#crop-btn").on("click", function (e) {
-            e.preventDefault(); 
+            e.preventDefault();
             if (!cropper) return;
-            cropper.croppie("result", { type: "base64", size: "viewport", format: "png" })
+            cropper.croppie("result", {
+                type: "base64",
+                size: { width: 800, height: 800 },  // ✅ viewport ki jagah HD size
+                format: "png",
+                quality: 1
+            })
                 .then(function (base64) {
-                    $("#cropped_image").val(base64); 
+                    $("#cropped_image").val(base64);
                     $("#crop-wrap").hide();
                     $("#crop-btn").hide();
                     $("#crop-preview").attr("src", base64);

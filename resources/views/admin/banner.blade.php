@@ -47,6 +47,7 @@
                 <tr>
                     <th>SR NO.</th>
                     <th>Photo</th>
+                    <th class="th-doctor">Prefix</th>
                     <th class="th-doctor">Doctor Name</th>
                     <th class="th-doctor">Msl Code</th>
                     <th class="th-doctor">Degree</th>
@@ -86,6 +87,11 @@
                             @endif
                         </td>
 
+                        <td>
+                            <div class="doc-name-cell">
+                                <span class="doc-name-text">{{ $banner->prefix ?? '-' }}</span>
+                            </div>
+                        </td>
                         <td>
                             <div class="doc-name-cell">
                                 <span class="doc-name-text">{{ $banner->name }}</span>
@@ -167,7 +173,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10">
+                        <td colspan="11">
                             <div class="empty-state">
                                 <i class="fas fa-user-md"></i>
                                 <h5>No records found</h5>
@@ -228,7 +234,7 @@
                         <div class="m-card-av {{ $c }}">{{ strtoupper(substr($banner->name, 0, 1)) }}</div>
                     @endif
                     <div class="m-card-title">
-                        <div class="m-card-name">{{ $banner->name }}</div>
+                        <div class="m-card-name">{{ $banner->prefix . $banner->name }}</div>
                         <div class="m-card-sub">{{ $banner->hospital_name }}</div>
                     </div>
                     <span class="m-card-serial-badge">#{{ $banners->firstItem() + $index }}</span>

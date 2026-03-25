@@ -9,6 +9,7 @@ class DoctorPoster extends Model
     protected $fillable = [
         'employee_id',
 //        'doctor_id',
+        'prefix',
         'name',
         'msl_code',
         'degree',

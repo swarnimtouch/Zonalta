@@ -124,6 +124,7 @@ class EmployeeLoginController extends Controller
 
         $poster = DoctorPoster::create([
             'employee_id' => $employee_id,
+            'prefix'      => $request->prefix,
             'name'        => $request->name,
             'msl_code'    => $request->msl_code,
             'degree'      => $request->degree,
@@ -162,49 +163,131 @@ class EmployeeLoginController extends Controller
         $bannerName     = $doctorName . '_banner.jpg';
         $bannerFullPath = $folder . '/' . $bannerName;
 
+        // Load background (1080x1080)
         $background = imagecreatefromjpeg(public_path('uploads/base_banner/background.jpg'));
 
+        // ── PHOTO (circle crop) ──────────────────────────────────────────
+        // From transform panel: X=291, Y=174, W=502, H=502
         if ($photoLocalPath && file_exists($photoLocalPath)) {
 
             $photo = imagecreatefromstring(file_get_contents($photoLocalPath));
+            $srcW  = imagesx($photo);
+            $srcH  = imagesy($photo);
 
-            $size = 250;
-            $x    = 300;
-            $y    = 300;
+            $size  = 502;
+            $destX = 291;
+            $destY = 174;
 
+            // ✅ Step 1: Photo ko square crop karo (center se) — aspect ratio preserve
+            $squareSize = min($srcW, $srcH);
+            $cropX      = (int)(($srcW - $squareSize) / 2);
+            $cropY      = (int)(($srcH - $squareSize) / 2);
+
+            $squared = imagecreatetruecolor($size, $size);
+            imagecopyresampled(
+                $squared, $photo,
+                0, 0,
+                $cropX, $cropY,
+                $size, $size,
+                $squareSize, $squareSize
+            );
+            imagedestroy($photo);
+
+            // ✅ Step 2: Circle mask — imagecopyresampled se sharp image pe apply karo
             $circle = imagecreatetruecolor($size, $size);
+            imagealphablending($circle, false);
             imagesavealpha($circle, true);
-            $trans = imagecolorallocatealpha($circle, 0, 0, 0, 127);
+            $trans  = imagecolorallocatealpha($circle, 0, 0, 0, 127);
             imagefill($circle, 0, 0, $trans);
 
             $radius = $size / 2;
-
             for ($i = 0; $i < $size; $i++) {
                 for ($j = 0; $j < $size; $j++) {
                     if ((($i - $radius) ** 2 + ($j - $radius) ** 2) < $radius ** 2) {
-                        $color = imagecolorat(
-                            $photo,
-                            (int)($i * imagesx($photo) / $size),
-                            (int)($j * imagesy($photo) / $size)
-                        );
+                        $color = imagecolorat($squared, $i, $j);
                         imagesetpixel($circle, $i, $j, $color);
                     }
                 }
             }
+            imagedestroy($squared);
 
-            imagecopy($background, $circle, $x, $y, 0, 0, $size, $size);
-            imagedestroy($photo);
+            // ✅ Step 3: Background pe paste karo
+            imagealphablending($background, true);
+            imagecopy($background, $circle, $destX, $destY, 0, 0, $size, $size);
             imagedestroy($circle);
         }
 
-        $black = imagecolorallocate($background, 0, 0, 0);
-        $font  = public_path('fonts/Poppins-Bold.ttf');
+        // ── TEXT ─────────────────────────────────────────────────────────
+        $blue     = imagecolorallocate($background, 8, 85, 165); // #0855a5
+        $fontBold = public_path('fonts/Baskervville-SemiBold.ttf');
+        $fontReg  = public_path('fonts/Baskervville-Regular.ttf');
 
-        imagettftext($background, 30, 0, 100, 500, $black, $font, $request->name);
-        imagettftext($background, 20, 0, 100, 550, $black, $font, "Degree: "  . $request->degree);
-        imagettftext($background, 20, 0, 100, 600, $black, $font, "Phone: "   . $request->phone);
-        imagettftext($background, 20, 0, 100, 650, $black, $font, "Address: " . $request->address);
+        $startX = 0;
+        $endX   = 1080;
 
+        // Helper: center text horizontally between startX and endX
+        $centerText = function($bg, $size, $angle, $font, $text, $y) use ($startX, $endX, $blue) {
+            $box = imagettfbbox($size, $angle, $font, $text);
+            $tw  = abs($box[2] - $box[0]);
+            $x   = $startX + (($endX - $startX) - $tw) / 2;
+            imagettftext($bg, $size, $angle, (int)$x, $y, $blue, $font, $text);
+        };
+
+        // NAME — SemiBold, centered, Y=2205
+        $fullName = trim(($request->prefix ? $request->prefix . ' ' : '') . $request->name);
+        $nameY = 770;
+        $centerText($background, 36, 0, $fontBold, $fullName, $nameY);
+
+
+        // DEGREE — Regular, below name
+        $degreeY = $nameY + 55;
+        $centerText($background, 24, 0, $fontReg, $request->degree, $degreeY);
+
+
+
+        // ADDRESS — conditional line wrapping (max 3 lines)
+        $address  = $request->address ?? '';
+        $maxChars = 35;
+        $words    = explode(' ', $address);
+        $lines    = [];
+        $line     = '';
+
+        foreach ($words as $word) {
+            $test = $line === '' ? $word : $line . ' ' . $word;
+            if (strlen($test) > $maxChars && $line !== '') {
+                $lines[] = $line;
+                $line    = $word;
+            } else {
+                $line = $test;
+            }
+        }
+        if ($line !== '') $lines[] = $line;
+
+        // Cap at 3 lines, truncate with '...' if exceeded
+        if (count($lines) > 3) {
+            $lines    = array_slice($lines, 0, 3);
+            $lines[2] .= '...';
+        }
+
+        $addrFontSize = 20;
+        $addrLineH    = 36;
+        $addrStartY   = $degreeY+ 50;
+
+        foreach ($lines as $i => $addrLine) {
+            $centerText(
+                $background,
+                $addrFontSize,
+                0,
+                $fontReg,
+                $addrLine,
+                $addrStartY + ($i * $addrLineH)
+            );
+        }
+        // PHONE — Regular, below degree
+        $phoneY = $addrStartY + (count($lines) * $addrLineH) + 15;
+
+        $centerText($background, 24, 0, $fontReg, $request->phone, $phoneY);
+        // ── SAVE & UPLOAD ─────────────────────────────────────────────────
         imagejpeg($background, $bannerFullPath, 90);
         imagedestroy($background);
 
@@ -221,9 +304,17 @@ class EmployeeLoginController extends Controller
         $employee = Employee::findOrFail($employee_id);
 
         $folder    = $this->makeLocalTempPath('videos');
-        $baseVideo = $videoType === 'Video1'
-            ? public_path('uploads/base_videos/Video1.mp4')
-            : public_path('uploads/base_videos/Video2.mp4');
+        $videoType = strtolower(trim($videoType));
+
+        $videoMap = [
+            'video1' => 'Video1.mp4',
+            'video2' => 'Video2.mp4',
+        ];
+
+// default fallback = Video1
+        $videoFile = $videoMap[$videoType] ?? 'Video1.mp4';
+
+        $baseVideo = public_path('uploads/base_videos/' . $videoFile);
 
         $finalName   = $doctorName . '_video.mp4';
         $finalPath   = $folder . '/' . $finalName;
@@ -246,14 +337,14 @@ class EmployeeLoginController extends Controller
         // ✅ FIX 1: pix_fmt yuv420p add kiya — base video se match karega
         // ✅ FIX 2: audio ko -ar se sample rate explicitly set kiya
         $cmd1 = "ffmpeg -y "
-            . "-loop 1 -t 5 -i \"{$bannerLocalPath}\" "
-            . "-f lavfi -t 5 -i \"anullsrc=channel_layout=stereo:sample_rate={$ar}\" "
+            . "-loop 1 -t 10 -i \"{$bannerLocalPath}\" "
+            . "-f lavfi -t 10 -i \"anullsrc=channel_layout=stereo:sample_rate={$ar}\" "
             . "-vf \"scale={$vw}:{$vh}:force_original_aspect_ratio=decrease,"
             .       "pad={$vw}:{$vh}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,fps={$fps}\" "
             . "-c:v libx264 -preset ultrafast -crf 23 "
             . "-pix_fmt yuv420p "
             . "-c:a aac -ar {$ar} -b:a 128k "
-            . "-t 5 "
+            . "-t 10 "
             . "\"{$bannerVideo}\" 2>&1";
 
         exec($cmd1, $out1, $rc1);

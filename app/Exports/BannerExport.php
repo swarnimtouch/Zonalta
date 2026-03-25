@@ -38,6 +38,7 @@ class BannerExport implements FromCollection, WithHeadings
             ->map(function ($item) {
 
                 return [
+                    $item->prefix ?? '-',
                     $item->name,
                     $item->msl_code,
                     $item->degree,
@@ -62,6 +63,7 @@ class BannerExport implements FromCollection, WithHeadings
     public function headings(): array
     {
         return [
+            'Prefix',
             'Doctor Name',
             'MSL Code',
             'Degree',

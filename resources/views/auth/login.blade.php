@@ -79,7 +79,7 @@
         }
 
         .icon-input-wrapper #password {
-            padding-right: 40px; 
+            padding-right: 40px;
         }
 
         .icon-input-wrapper .form-control:focus {
@@ -110,13 +110,13 @@
         }
 
         label.error {
-            color: #dc3545; 
+            color: #dc3545;
             font-size: 12px;
             margin-top: 4px;
             display: block;
             font-weight: 500;
         }
-        
+
         .form-control.error {
             border-color: #dc3545;
         }
@@ -125,14 +125,14 @@
 <body class="d-flex justify-content-center align-items-center vh-100 m-0 px-3">
 
     <div class="card login-card bg-white">
-        
+
         <div class="card-header bg-transparent border-bottom px-4 pt-4 pb-3 text-center">
             <img src="{{ asset('images/logo.png') }}" alt="Zonalta Logo" class="logo mb-3" onerror="this.style.display='none'">
             <h2 class="login-title m-0">ADMIN LOGIN</h2>
         </div>
 
         <div class="card-body p-4">
-            
+
             @if(session('error') || $errors->any())
                 <div class="alert alert-danger py-2 px-3 text-center" style="font-size: 14px;" role="alert">
                     {{ session('error') ?? $errors->first() }}
@@ -146,7 +146,7 @@
                     <label class="form-label" for="email">Email Address</label>
                     <div class="icon-input-wrapper">
                         <i class="fa-solid fa-envelope left-icon"></i>
-                        <input type="email" name="email" id="email" class="form-control py-2" placeholder="admin@gmail.com" value="{{ old('email') }}">
+                        <input type="email" name="email" id="email" class="form-control py-2" placeholder="Enter Email Address" value="{{ old('email') }}">
                     </div>
                 </div>
 
@@ -175,7 +175,7 @@
 
     <script>
         $(document).ready(function () {
-            
+
             $(".toggle-password").click(function() {
                 $(this).toggleClass("fa-eye-slash fa-eye");
                 var input = $("#password");
