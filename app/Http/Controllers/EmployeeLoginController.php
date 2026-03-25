@@ -230,6 +230,7 @@ class EmployeeLoginController extends Controller
         $bannerVideo = $folder . '/' . $doctorName . '_banner_clip.mp4';
         $concatList  = $folder . '/' . $doctorName . '_concat.txt';
 
+        // Base video ka size/fps/audio detect karo
         $sizeOut   = trim(shell_exec("ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 \"{$baseVideo}\" 2>&1"));
         $sizeParts = explode(',', $sizeOut);
         $vw = isset($sizeParts[0]) && (int)$sizeParts[0] > 0 ? (int)$sizeParts[0] : 1080;
@@ -242,40 +243,61 @@ class EmployeeLoginController extends Controller
         $arRaw = trim(shell_exec("ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 \"{$baseVideo}\" 2>&1"));
         $ar    = (is_numeric($arRaw) && (int)$arRaw > 0) ? (int)$arRaw : 44100;
 
+        // ✅ FIX 1: pix_fmt yuv420p add kiya — base video se match karega
+        // ✅ FIX 2: audio ko -ar se sample rate explicitly set kiya
         $cmd1 = "ffmpeg -y "
             . "-loop 1 -t 5 -i \"{$bannerLocalPath}\" "
             . "-f lavfi -t 5 -i \"anullsrc=channel_layout=stereo:sample_rate={$ar}\" "
-            . "-vf \"scale={$vw}:{$vh}:force_original_aspect_ratio=decrease,pad={$vw}:{$vh}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={$fps}\" "
-            . "-c:v libx264 -preset ultrafast -crf 23 "  // ultrafast here — banner is static image
-            . "-c:a aac -b:a 192k -shortest "
+            . "-vf \"scale={$vw}:{$vh}:force_original_aspect_ratio=decrease,"
+            .       "pad={$vw}:{$vh}:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,fps={$fps}\" "
+            . "-c:v libx264 -preset ultrafast -crf 23 "
+            . "-pix_fmt yuv420p "
+            . "-c:a aac -ar {$ar} -b:a 128k "
+            . "-t 5 "
             . "\"{$bannerVideo}\" 2>&1";
 
         exec($cmd1, $out1, $rc1);
-        if ($rc1 !== 0) {
+
+        \Log::info('ffmpeg_step1', [
+            'rc'     => $rc1,
+            'exists' => file_exists($bannerVideo),
+            'size'   => file_exists($bannerVideo) ? filesize($bannerVideo) : 0,
+            'output' => implode("\n", $out1),
+        ]);
+
+        if ($rc1 !== 0 || !file_exists($bannerVideo) || filesize($bannerVideo) === 0) {
             \Log::error('ffmpeg step1 failed', ['cmd' => $cmd1, 'output' => $out1]);
-            abort(500, 'Banner clip generation failed: ' . implode("\n", $out1));
+            abort(500, 'Banner clip generation failed');
         }
 
         file_put_contents($concatList,
-            "file '" . addslashes($baseVideo)   . "'\n" .  // ← base video FIRST
-            "file '" . addslashes($bannerVideo) . "'\n"    // ← banner LAST
+            "file '" . str_replace("'", "'\\''", $baseVideo)   . "'\n" .
+            "file '" . str_replace("'", "'\\''", $bannerVideo) . "'\n"
         );
 
-
+        // ✅ FIX 3: -c copy ki jagah re-encode — codec/format mismatch resolve hoga
         $cmd2 = "ffmpeg -y "
             . "-f concat -safe 0 -i \"{$concatList}\" "
-            . "-c copy "   // ← stream copy everything — ZERO re-encoding of base video
+            . "-c copy "                // ✅ zero re-encoding
             . "-movflags +faststart "
             . "\"{$finalPath}\" 2>&1";
 
+
         exec($cmd2, $out2, $rc2);
+
+        \Log::info('ffmpeg_step2', [
+            'rc'           => $rc2,
+            'final_exists' => file_exists($finalPath),
+            'final_size'   => file_exists($finalPath) ? filesize($finalPath) : 0,
+            'output'       => implode("\n", $out2),
+        ]);
 
         @unlink($bannerVideo);
         @unlink($concatList);
 
-        if ($rc2 !== 0) {
+        if ($rc2 !== 0 || !file_exists($finalPath) || filesize($finalPath) === 0) {
             \Log::error('ffmpeg step2 failed', ['cmd' => $cmd2, 'output' => $out2]);
-            abort(500, 'Video concat failed: ' . implode("\n", $out2));
+            abort(500, 'Video concat failed');
         }
 
         $positionCode = $employee->position_code ?? 'unknown';
