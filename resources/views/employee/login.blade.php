@@ -200,10 +200,10 @@
                 },
                 messages: {
                     employee_code: {
-                        required: "Please enter your employee code"
+                        required: "Please enter employee code"
                     },
                     password: {
-                        required: "Please enter your password",
+                        required: "Please enter password",
                         equalTo: "Password must match employee code"
                     }
                 },

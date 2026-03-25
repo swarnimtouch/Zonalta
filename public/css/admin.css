@@ -1125,3 +1125,40 @@ body {
     .m-fields-grid { grid-template-columns: 1fr; }
     .m-field.full  { grid-column: 1; }
 }
+
+.sidebar-toggle-btn {
+    background: transparent;
+    border: none;
+    color: #4a5568; /* Button ka color */
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+}
+
+.sidebar-toggle-btn:hover {
+    color: #2e59d9;
+}
+
+#topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Mobile Screen ke liye adjustments */
+@media (max-width: 991px) {
+    .sidebar-toggle-btn {
+        display: block;
+    }
+    
+    /* Agar mobile me breadcrumb ki wajah se jagah kam pade, toh isko comment se hata kar breadcrumb hide kar sakte hain */
+    /*
+    .topbar-breadcrumb {
+        display: none; 
+    }
+    */
+}
