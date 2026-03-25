@@ -356,6 +356,43 @@
             text-align: center;
             margin-top: 10px;
         }
+
+        .radio-card {
+            flex: 1;
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            background-color: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a2e;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin: 0;
+        }
+        .radio-label i {
+            color: #204e8a;
+            transition: color 0.3s ease;
+        }
+        .radio-card input:checked + .radio-label {
+            background-color: #204e8a;
+            color: #ffffff;
+            border-color: #204e8a;
+            box-shadow: 0 4px 10px rgba(32, 78, 138, 0.2);
+        }
+        .radio-card input:checked + .radio-label i {
+            color: #ffffff;
+        }
+        .radio-label:hover {
+            border-color: #204e8a;
+            background-color: #ffffff;
+        }
     </style>
 </head>
 <body>
@@ -445,15 +482,22 @@
             </div>
             <div class="row mb-4">
                 <div class="col-12">
-                    <label class="form-label" for="video_type">Video Type</label>
-                    <div class="icon-input-wrapper">
-                        <i class="fa-solid fa-video"></i>
-                        <select name="video_type" id="video_type" class="form-select">
-                            <option value="">Select Video Type</option>
-                            <option value="Video1">Video 1</option>
-                            <option value="Video2">Video 2</option>
-                        </select>
+                    <label class="form-label d-block mb-3">Video Type</label>
+                    <div class="d-flex gap-3">
+                        <div class="radio-card">
+                            <input type="radio" name="video_type" id="bipolar1" value="Bipolar 1" class="d-none">
+                            <label for="bipolar1" class="radio-label">
+                                 Bipolar 1
+                            </label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="video_type" id="bipolar2" value="Bipolar 2" class="d-none">
+                            <label for="bipolar2" class="radio-label">
+                                 Bipolar 2
+                            </label>
+                        </div>
                     </div>
+                    <div id="video_type_error"></div>
                 </div>
             </div>
             <div class="photo-section">
@@ -552,6 +596,9 @@
             errorPlacement: function(error, element) {
                 if(element.attr("name") == "cropped_image") {
                     error.insertAfter("#upload-box-wrapper");
+                } else if(element.attr("name") == "video_type") {
+                    // Radio button ki error naye div me jayegi
+                    error.appendTo("#video_type_error"); 
                 } else {
                     error.insertAfter(element.closest(".icon-input-wrapper"));
                 }
