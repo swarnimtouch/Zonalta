@@ -278,7 +278,7 @@ class EmployeeLoginController extends Controller
             . "-filter_complex \""
             .   "[1:v]scale={$vw}:{$vh},setsar=1,fps={$fps}[banner_v];"
             .   "anullsrc=channel_layout=stereo:sample_rate={$ar},atrim=duration=5[banner_a];"
-            .   "[0:v][0:a?][banner_v][banner_a]concat=n=2:v=1:a=1[outv][outa]"
+            .   "[0:v][0:a][banner_v][banner_a]concat=n=2:v=1:a=1[outv][outa]"  // ← [0:a?] hatao, sirf [0:a]
             . "\" "
             . "-map \"[outv]\" "
             . "-map \"[outa]\" "
@@ -286,6 +286,7 @@ class EmployeeLoginController extends Controller
             . "-c:a aac -b:a 192k "
             . "-movflags +faststart "
             . "\"{$finalPath}\" 2>&1";
+
 
         exec($cmd, $output, $returnCode);
 
