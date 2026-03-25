@@ -57,7 +57,7 @@
                     <th class="th-doctor">Degree</th>
                     <th class="th-doctor">Mobile Number</th>
                     <th class="th-doctor">Address</th>
-                    <th class="th-employee col-sep">Employee Name</th>
+                    <th class="th-employee ">Employee Name</th>
                     <th class="th-employee">Employee Code</th>
                     <th>Created</th>
                     <th>Action</th>
@@ -101,7 +101,7 @@
                         <td><span class="badge-mono">{{ $banner->degree }}</span></td>
                         <td class="text-muted-sm">{{ $banner->phone ?? '—' }}</td>
                         <td class="text-muted-sm">{{ $banner->address ?? '—' }}</td>
-                        <td class="col-sep" style="font-weight:500;">{{ $banner->employee->name ?? '—' }}</td>
+                        <td style="font-weight:500;">{{ $banner->employee->name ?? '—' }}</td>
                         <td><span class="badge-mono emp">{{ $banner->employee->employee_code ?? '—' }}</span></td>
 
                         <td class="text-muted-sm" style="font-size:0.75rem; white-space:nowrap;">

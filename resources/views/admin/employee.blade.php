@@ -55,7 +55,7 @@
                     <th class="th-doctor">Employee Code</th>
                     <th class="th-doctor">Position Code</th>
                     <th class="th-doctor">Designation</th>
-                    <th class="th-employee col-sep">HQ Name</th>
+                    <th class="th-employee ">HQ Name</th>
                     <th class="th-employee">HQ Code</th>
                     <th>Created</th>
                     <th>Action</th>
@@ -75,7 +75,7 @@
                         <td><span class="badge-mono emp">{{ $employee->employee_code ?? '—' }}</span></td>
                         <td><span class="badge-mono">{{ $employee->position_code ?? '—' }}</span></td>
                         <td style="font-weight:500;">{{ $employee->designation ?? '—' }}</td>
-                        <td class="col-sep text-muted-sm">{{ $employee->hq_name ?? '—' }}</td>
+                        <td class="text-muted-sm">{{ $employee->hq_name ?? '—' }}</td>
                         <td><span class="badge-mono">{{ $employee->hq_code ?? '—' }}</span></td>
 
                         <td class="text-muted-sm" style="font-size:0.75rem; white-space:nowrap;">
