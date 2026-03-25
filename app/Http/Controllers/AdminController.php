@@ -81,7 +81,6 @@ class AdminController extends Controller
             ->latest()
             ->paginate(10);
 
-        // 🔥 URLs generate here (important part)
         $banners->getCollection()->transform(function ($banner) {
 
             $banner->photo_url = $banner->photo

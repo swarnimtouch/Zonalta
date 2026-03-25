@@ -62,9 +62,7 @@ class EmployeeLoginController extends Controller
         return redirect()->route('login');
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    //  GENERATE BANNER + VIDEO
-    // ─────────────────────────────────────────────────────────────────
+
     public function storePoster(Request $request)
     {
         $employee_id = session('employee_id');
@@ -85,7 +83,6 @@ class EmployeeLoginController extends Controller
 
         $doctorName = $this->cleanName($request->name);
 
-        // ── Photo ──────────────────────────────────────────────────
         $photoPath   = null;
         $photoS3Path = null;
 
@@ -105,7 +102,6 @@ class EmployeeLoginController extends Controller
             $photoPath   = $localPhotoFull;
         }
 
-        // ── Banner ────────────────────────────────────────────────
         [$bannerLocalPath, $bannerS3Path] = $this->generateBanner(
             $request,
             $photoPath,
@@ -113,7 +109,6 @@ class EmployeeLoginController extends Controller
             $doctorName
         );
 
-        // ── Video ─────────────────────────────────────────────────
         [$videoLocalPath, $videoS3Path] = $this->generateVideo(
             $request->video_type,
             $bannerLocalPath,
@@ -121,14 +116,12 @@ class EmployeeLoginController extends Controller
             $doctorName
         );
 
-        // ── Cleanup local temp files ──────────────────────────────
         @unlink($bannerLocalPath);
         @unlink($videoLocalPath);
         if ($photoPath) {
             @unlink($photoPath);
         }
 
-        // ── Save to DB ────────────────────────────────────────────
         $poster = DoctorPoster::create([
             'employee_id' => $employee_id,
             'name'        => $request->name,
@@ -141,16 +134,11 @@ class EmployeeLoginController extends Controller
             'video_path'  => $videoS3Path,
         ]);
 
-        // Poster ID session mein save — URL nahi badlegi
         session()->flash('poster_id', $poster->id);
 
 
         return redirect()->route('dashboard');
     }
-
-    // ═════════════════════════════════════════════════════════════════
-    //  HELPERS
-    // ═════════════════════════════════════════════════════════════════
 
     private function makeLocalTempPath($type)
     {
@@ -166,9 +154,6 @@ class EmployeeLoginController extends Controller
         return strtolower(preg_replace('/[^A-Za-z0-9]/', '_', $name));
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    //  BANNER GENERATOR
-    // ─────────────────────────────────────────────────────────────────
     private function generateBanner($request, $photoLocalPath, $employee_id, $doctorName)
     {
         $employee = Employee::findOrFail($employee_id);
@@ -230,9 +215,7 @@ class EmployeeLoginController extends Controller
         return [$bannerFullPath, $s3Key];
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    //  VIDEO GENERATOR
-    // ─────────────────────────────────────────────────────────────────
+
     private function generateVideo($videoType, $bannerLocalPath, $employee_id, $doctorName)
     {
         $employee = Employee::findOrFail($employee_id);
@@ -242,60 +225,57 @@ class EmployeeLoginController extends Controller
             ? public_path('uploads/base_videos/Video1.mp4')
             : public_path('uploads/base_videos/Video2.mp4');
 
-        $finalName = $doctorName . '_video.mp4';
-        $finalPath = $folder . '/' . $finalName;
+        $finalName   = $doctorName . '_video.mp4';
+        $finalPath   = $folder . '/' . $finalName;
+        $bannerVideo = $folder . '/' . $doctorName . '_banner_clip.mp4';
+        $concatList  = $folder . '/' . $doctorName . '_concat.txt';
 
-        // ── Detect video resolution ───────────────────────────────
-        $sizeCmd   = "ffprobe -v error -select_streams v:0 "
-            . "-show_entries stream=width,height "
-            . "-of csv=p=0 \"{$baseVideo}\" 2>&1";
-        $sizeOut   = trim(shell_exec($sizeCmd));
+        $sizeOut   = trim(shell_exec("ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 \"{$baseVideo}\" 2>&1"));
         $sizeParts = explode(',', $sizeOut);
         $vw = isset($sizeParts[0]) && (int)$sizeParts[0] > 0 ? (int)$sizeParts[0] : 1080;
         $vh = isset($sizeParts[1]) && (int)$sizeParts[1] > 0 ? (int)$sizeParts[1] : 1920;
 
-        // ── Detect frame rate ─────────────────────────────────────
-        $fpsCmd   = "ffprobe -v error -select_streams v:0 "
-            . "-show_entries stream=r_frame_rate "
-            . "-of default=noprint_wrappers=1:nokey=1 \"{$baseVideo}\" 2>&1";
-        $fpsRaw   = trim(shell_exec($fpsCmd));
+        $fpsRaw   = trim(shell_exec("ffprobe -v error -select_streams v:0 -show_entries stream=r_frame_rate -of default=noprint_wrappers=1:nokey=1 \"{$baseVideo}\" 2>&1"));
         $fpsParts = explode('/', $fpsRaw);
-        $fps = (count($fpsParts) === 2 && (int)$fpsParts[1] > 0)
-            ? round((int)$fpsParts[0] / (int)$fpsParts[1])
-            : 25;
+        $fps = (count($fpsParts) === 2 && (int)$fpsParts[1] > 0) ? round((int)$fpsParts[0] / (int)$fpsParts[1]) : 25;
 
-        // ── Detect audio sample rate ──────────────────────────────
-        $arCmd = "ffprobe -v error -select_streams a:0 "
-            . "-show_entries stream=sample_rate "
-            . "-of default=noprint_wrappers=1:nokey=1 \"{$baseVideo}\" 2>&1";
-        $arRaw = trim(shell_exec($arCmd));
+        $arRaw = trim(shell_exec("ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 \"{$baseVideo}\" 2>&1"));
         $ar    = (is_numeric($arRaw) && (int)$arRaw > 0) ? (int)$arRaw : 44100;
 
-        // ── FFmpeg command ────────────────────────────────────────
-        $cmd = "ffmpeg -y "
-            . "-i \"{$baseVideo}\" "
+        $cmd1 = "ffmpeg -y "
             . "-loop 1 -t 5 -i \"{$bannerLocalPath}\" "
-            . "-filter_complex \""
-            .   "[1:v]scale={$vw}:{$vh},setsar=1,fps={$fps}[banner_v];"
-            .   "anullsrc=channel_layout=stereo:sample_rate={$ar},atrim=duration=5[banner_a];"
-            .   "[0:v][0:a][banner_v][banner_a]concat=n=2:v=1:a=1[outv][outa]"  // ← [0:a?] hatao, sirf [0:a]
-            . "\" "
-            . "-map \"[outv]\" "
-            . "-map \"[outa]\" "
-            . "-c:v libx264 -preset fast -crf 23 "
-            . "-c:a aac -b:a 192k "
+            . "-f lavfi -t 5 -i \"anullsrc=channel_layout=stereo:sample_rate={$ar}\" "
+            . "-vf \"scale={$vw}:{$vh}:force_original_aspect_ratio=decrease,pad={$vw}:{$vh}:(ow-iw)/2:(oh-ih)/2,setsar=1,fps={$fps}\" "
+            . "-c:v libx264 -preset ultrafast -crf 23 "  // ultrafast here — banner is static image
+            . "-c:a aac -b:a 192k -shortest "
+            . "\"{$bannerVideo}\" 2>&1";
+
+        exec($cmd1, $out1, $rc1);
+        if ($rc1 !== 0) {
+            \Log::error('ffmpeg step1 failed', ['cmd' => $cmd1, 'output' => $out1]);
+            abort(500, 'Banner clip generation failed: ' . implode("\n", $out1));
+        }
+
+        file_put_contents($concatList,
+            "file '" . addslashes($baseVideo)   . "'\n" .  // ← base video FIRST
+            "file '" . addslashes($bannerVideo) . "'\n"    // ← banner LAST
+        );
+
+
+        $cmd2 = "ffmpeg -y "
+            . "-f concat -safe 0 -i \"{$concatList}\" "
+            . "-c copy "   // ← stream copy everything — ZERO re-encoding of base video
             . "-movflags +faststart "
             . "\"{$finalPath}\" 2>&1";
 
+        exec($cmd2, $out2, $rc2);
 
-        exec($cmd, $output, $returnCode);
+        @unlink($bannerVideo);
+        @unlink($concatList);
 
-        if ($returnCode !== 0) {
-            \Log::error('ffmpeg failed', [
-                'cmd'    => $cmd,
-                'output' => $output,
-            ]);
-            abort(500, 'Video generation failed: ' . implode("\n", $output));
+        if ($rc2 !== 0) {
+            \Log::error('ffmpeg step2 failed', ['cmd' => $cmd2, 'output' => $out2]);
+            abort(500, 'Video concat failed: ' . implode("\n", $out2));
         }
 
         $positionCode = $employee->position_code ?? 'unknown';
@@ -305,9 +285,6 @@ class EmployeeLoginController extends Controller
         return [$finalPath, $s3Key];
     }
 
-    // ─────────────────────────────────────────────────────────────────
-    //  DOWNLOAD
-    // ─────────────────────────────────────────────────────────────────
     public function downloadBanner($id)
     {
         $poster = DoctorPoster::findOrFail($id);

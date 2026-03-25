@@ -9,7 +9,6 @@
 
 @section('content')
 
-    {{-- ── Page Header ── --}}
     <div class="page-header">
         <div class="page-title-group">
             <h4>Banner</h4>
@@ -20,7 +19,6 @@
         </a>
     </div>
 
-    {{-- ── Success Alert ── --}}
     @if(session('success'))
         <div class="alert-success-bar">
             <i class="fas fa-check-circle"></i>
@@ -28,7 +26,6 @@
         </div>
     @endif
 
-    {{-- ── Live Search Bar ── --}}
     <div class="filter-bar">
         <div class="search-wrap">
             <i class="fas fa-search search-icon"></i>
@@ -42,9 +39,7 @@
         </div>
     </div>
 
-    {{-- ════════════════════════════════════════
-         DESKTOP TABLE (≥ 768px)
-    ════════════════════════════════════════ --}}
+
     <div class="glass-card desktop-view">
         <div class="table-wrap">
             <table class="doc-table">
@@ -111,7 +106,6 @@
                         <td>
                             <div class="action-btns">
 
-                                {{-- Banner Image Button --}}
                                 @if($bannerUrl)
                                     <button type="button"
                                             class="act-btn banner-btn"
@@ -134,7 +128,6 @@
                                     </button>
                                 @endif
 
-                                {{-- Video Button --}}
                                 @if($videoUrl)
                                     <button type="button"
                                             class="act-btn video-btn"
@@ -157,7 +150,6 @@
                                     </button>
                                 @endif
 
-                                {{-- Delete --}}
                                 <form action="{{ route('admin.banner.destroy', $banner->id) }}"
                                       method="POST"
                                       class="delete-form">
@@ -212,9 +204,6 @@
         @endif
     </div>
 
-    {{-- ════════════════════════════════════════
-         MOBILE CARDS (< 768px)
-    ════════════════════════════════════════ --}}
     <div class="mobile-view">
 
         @forelse($banners as $index => $banner)
@@ -228,7 +217,6 @@
 
             <div class="m-card" style="animation-delay:{{ $index * 0.04 }}s;">
 
-                {{-- Card Header --}}
                 <div class="m-card-header">
                     @if($photoUrl)
                         <img src="{{ $photoUrl }}"
@@ -246,7 +234,6 @@
                     <span class="m-card-serial-badge">#{{ $banners->firstItem() + $index }}</span>
                 </div>
 
-                {{-- Banner & Video Buttons --}}
                 <div class="m-media-btns">
                     @if($bannerUrl)
                         <button type="button"
@@ -291,7 +278,6 @@
                     @endif
                 </div>
 
-                {{-- Doctor Details --}}
                 <div class="m-section-label banner">
                     <i class="fas fa-user-md"></i> Doctor Details
                 </div>
@@ -331,14 +317,10 @@
                             <div class="m-field-label"><i class="fas fa-id-badge"></i> Employee Code</div>
                             <div class="m-field-value mono-emp">{{ $banner->employee->employee_code ?? '—' }}</div>
                         </div>
-                        <div class="m-field">
-                            <div class="m-field-label"><i class="fas fa-map-marker-alt"></i> Employee City</div>
-                            <div class="m-field-value {{ $banner->employee->city ? '' : 'muted' }}">{{ $banner->employee->city ?? 'Not set' }}</div>
-                        </div>
+
                     </div>
                 </div>
 
-                {{-- Footer --}}
                 <div class="m-card-footer">
                     <div class="m-card-date">
                         <i class="fas fa-calendar me-1"></i>
@@ -391,10 +373,7 @@
 
     </div>
 
-    {{-- ════════════════════════════════════════
-         UNIFIED MEDIA MODAL
-         Handles: photo preview / banner image / video
-    ════════════════════════════════════════ --}}
+
     <div class="media-modal-overlay" id="mediaModal" onclick="closeMediaModal(event)">
         <div class="media-modal-box">
 
@@ -402,17 +381,15 @@
                 <i class="fas fa-times"></i>
             </button>
 
-            {{-- Tabs / type indicator --}}
             <div class="media-modal-tabs" id="mediaTabs"></div>
 
-            {{-- Media content (img or video) --}}
+
             <div id="mediaContent"></div>
 
-            {{-- Name & employee id --}}
+
             <div class="media-modal-name"  id="mediaName"></div>
             <div class="media-modal-empid" id="mediaEmpId"></div>
 
-            {{-- Download buttons row --}}
             <div class="media-dl-row" id="mediaDlRow"></div>
 
         </div>
@@ -427,15 +404,7 @@
         const downloadVideoRoute  = "{{ route('download.video', ':id') }}";
     </script>
     <script>
-        // ══════════════════════════════════════════════════════════
-        //  UNIFIED MEDIA MODAL
-        //  type: 'photo' | 'banner' | 'video'
-        //  photoUrl   – doctor profile photo
-        //  bannerUrl  – banner image (uploads/EMP001/banners/...)
-        //  name       – doctor name
-        //  empCode    – employee code
-        //  videoUrl   – video file  (uploads/EMP001/videos/...)
-        // ══════════════════════════════════════════════════════════
+
         function openMediaModal(type, photoUrl, bannerUrl, name, empCode, videoUrl, bannerId, videoId) {
             const modal    = document.getElementById('mediaModal');
             const content  = document.getElementById('mediaContent');
@@ -451,7 +420,6 @@
             dlRow.innerHTML   = '';
 
             if (type === 'photo') {
-                // ── Profile photo (view only) ──
                 tabs.innerHTML = `<span class="media-tab-badge active-banner"><i class="fas fa-user"></i> Profile Photo</span>`;
 
                 if (photoUrl && photoUrl !== 'null') {
@@ -460,17 +428,14 @@
                     content.appendChild(noMediaPlaceholder('image'));
                 }
 
-                // No download for profile photo (add if needed)
                 dlRow.innerHTML = '';
 
             } else if (type === 'banner') {
-                // ── Banner Image ──
                 tabs.innerHTML = `<span class="media-tab-badge active-banner"><i class="fas fa-image"></i> Banner Image</span>`;
 
                 if (bannerUrl && bannerUrl !== 'null') {
                     content.innerHTML = `<img src="${bannerUrl}" alt="${name}" onerror="this.replaceWith(noMediaPlaceholder('image'))">`;
 
-                    // Filename from path
                     const downloadUrl = downloadBannerRoute.replace(':id', bannerId);
 
                     dlRow.innerHTML = `
@@ -484,7 +449,6 @@
                 }
 
             } else if (type === 'video') {
-                // ── Video ──
                 tabs.innerHTML = `<span class="media-tab-badge active-video"><i class="fas fa-video"></i> Video Banner</span>`;
 
                 if (videoUrl && videoUrl !== 'null') {
@@ -499,7 +463,6 @@
 
                     const src = document.createElement('source');
                     src.src  = videoUrl;
-                    // Detect extension for MIME
                     const ext = videoUrl.split('.').pop().toLowerCase();
                     const mime = ext === 'webm' ? 'video/webm' : (ext === 'ogg' ? 'video/ogg' : 'video/mp4');
                     src.type = mime;
@@ -529,7 +492,6 @@
             modal.classList.add('open');
         }
 
-        // Placeholder when media fails / missing
         function noMediaPlaceholder(mediaType) {
             const div = document.createElement('div');
             div.style.cssText = `
@@ -545,7 +507,6 @@
             return div;
         }
 
-        // Close on overlay click
         function closeMediaModal(e) {
             if (e.target.id === 'mediaModal') closeMediaModalDirect();
         }
@@ -553,19 +514,15 @@
         function closeMediaModalDirect() {
             const modal = document.getElementById('mediaModal');
             modal.classList.remove('open');
-            // Stop video playback
             const vid = modal.querySelector('video');
             if (vid) { vid.pause(); vid.currentTime = 0; }
         }
 
-        // ESC key
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeMediaModalDirect();
         });
 
-        // ══════════════════════════════════════
-        // SWEET ALERT DELETE CONFIRM
-        // ══════════════════════════════════════
+
         document.addEventListener('click', function (e) {
             const btn = e.target.closest('.btn-delete');
             if (!btn) return;
@@ -610,9 +567,7 @@
             });
         });
 
-        // ══════════════════════════════════════
-        // SUCCESS TOAST
-        // ══════════════════════════════════════
+
         @if(session('success'))
         Swal.fire({
             toast: true,
@@ -628,9 +583,7 @@
         });
         @endif
 
-        // ══════════════════════════════════════
-        // LIVE SEARCH
-        // ══════════════════════════════════════
+
         (function () {
             const input   = document.getElementById('liveSearch');
             const spinner = document.getElementById('searchSpinner');

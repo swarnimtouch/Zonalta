@@ -25,7 +25,7 @@ Route::get('/result/{poster}', [EmployeeLoginController::class, 'result'])->name
 Route::get('/download/banner/{id}', [EmployeeLoginController::class, 'downloadBanner'])->name('download.banner');
 Route::get('/download/video/{id}', [EmployeeLoginController::class, 'downloadVideo'])->name('download.video');
 Route::prefix('admin')->group(function () {
-    Route::get('/login',  [AdminController::class, 'showLoginForm'])->name('login');
+    Route::get('/login',  [AdminController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/login', [AdminController::class, 'login'])->name('admin.login.submit');
     Route::post('/logout',[AdminController::class, 'logout'])->name('admin.logout');
 });
