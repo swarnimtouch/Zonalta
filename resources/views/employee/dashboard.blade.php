@@ -434,7 +434,25 @@
             <i class="fa-solid fa-circle-exclamation me-2"></i> {{ session('error') }}
         </div>
     @endif
-    <div class="custom-card">
+        @if(isset($poster) && $poster && $poster->banner_path)
+            <div class="alert mb-4 d-flex align-items-center gap-3"
+                 style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border: 1.5px solid #34d399; border-radius: 12px; padding: 16px 20px; font-size: 14px; color: #065f46; box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);"
+                 role="alert">
+                <div style="background: #10b981; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fa-solid fa-check" style="color: #ffffff; font-size: 16px;"></i>
+                </div>
+                <div>
+                    <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">
+                        Banner & Video Generated Successfully!
+                    </div>
+                    <div style="font-weight: 400; color: #047857;">
+                        Your files are ready. Scroll down to download your banner and video.
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <div class="custom-card">
         <h3><i class="fa-solid fa-pen-to-square me-2"></i> Create Poster</h3>
         <form id="dashboardForm" method="POST" action="{{ route('poster.store') }}" novalidate>
             @csrf

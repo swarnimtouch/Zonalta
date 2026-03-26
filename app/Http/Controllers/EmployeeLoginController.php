@@ -349,12 +349,7 @@ class EmployeeLoginController extends Controller
 
         exec($cmd1, $out1, $rc1);
 
-        \Log::info('ffmpeg_step1', [
-            'rc'     => $rc1,
-            'exists' => file_exists($bannerVideo),
-            'size'   => file_exists($bannerVideo) ? filesize($bannerVideo) : 0,
-            'output' => implode("\n", $out1),
-        ]);
+
 
         if ($rc1 !== 0 || !file_exists($bannerVideo) || filesize($bannerVideo) === 0) {
             \Log::error('ffmpeg step1 failed', ['cmd' => $cmd1, 'output' => $out1]);
@@ -376,12 +371,7 @@ class EmployeeLoginController extends Controller
 
         exec($cmd2, $out2, $rc2);
 
-        \Log::info('ffmpeg_step2', [
-            'rc'           => $rc2,
-            'final_exists' => file_exists($finalPath),
-            'final_size'   => file_exists($finalPath) ? filesize($finalPath) : 0,
-            'output'       => implode("\n", $out2),
-        ]);
+
 
         @unlink($bannerVideo);
         @unlink($concatList);
