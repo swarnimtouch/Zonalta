@@ -15,6 +15,8 @@ class DoctorPoster extends Model
         'degree',
         'phone',
         'address',
+        'language',
+        'banner_type',
         'photo',
         'banner_path',
         'video_path'

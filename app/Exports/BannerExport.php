@@ -40,16 +40,18 @@ class BannerExport implements FromCollection, WithHeadings
                 return [
                     $item->prefix ?? '-',
                     $item->name,
-                    $item->msl_code,
-                    $item->degree,
-                    $item->phone,
-                    $item->address,
+                    $item->msl_code ?? '-',
+                    $item->degree ?? '-',
+                    $item->phone ?? '-',
+                    $item->address ?? '-',
+                    $item->language ?? '-',
+                    $item->banner_type ?? '-',
 
                     $item->employee->name ?? '',
                     $item->employee->employee_code ?? '',
                     $item->employee->position_code ?? '',
 
-                    $item->photo ? Storage::disk('s3')->url($item->photo) : '',
+                    $item->photo ? Storage::disk('s3')->url($item->photo) : '-',
                     $item->banner_path ? Storage::disk('s3')->url($item->banner_path) : '',
                     $item->video_path ? Storage::disk('s3')->url($item->video_path) : '',
 
@@ -69,6 +71,8 @@ class BannerExport implements FromCollection, WithHeadings
             'Degree',
             'Phone',
             'Address',
+            'Language',
+            'Banner Type',
             'Employee Name',
             'Employee Code',
             'Position Code',

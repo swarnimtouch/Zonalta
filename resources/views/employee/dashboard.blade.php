@@ -28,14 +28,8 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border-bottom: 2px solid #204e8a;
         }
-        .topbar-logo {
-            max-height: 45px;
-            width: auto;
-        }
-        .user-profile {
-            display: flex;
-            align-items: center;
-        }
+        .topbar-logo { max-height: 45px; width: auto; }
+        .user-profile { display: flex; align-items: center; }
         .profile-info {
             position: relative;
             cursor: pointer;
@@ -44,25 +38,19 @@
             transition: background 0.3s;
         }
         .avatar-circle {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             border-radius: 50%;
             background-color: #204e8a;
             color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.1rem;
-            font-weight: 600;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.1rem; font-weight: 600;
         }
         .profile-dropdown {
             position: absolute;
-            top: 150%;
-            right: 0;
+            top: 150%; right: 0;
             width: 200px;
             background: #ffffff;
-            opacity: 0;
-            visibility: hidden;
+            opacity: 0; visibility: hidden;
             transform: translateY(10px);
             transition: all 0.3s ease;
             z-index: 1050;
@@ -73,120 +61,81 @@
         .profile-dropdown::before {
             content: "";
             position: absolute;
-            top: -8px;
-            right: 20px;
+            top: -8px; right: 20px;
             border-left: 8px solid transparent;
             border-right: 8px solid transparent;
             border-bottom: 8px solid #ffffff;
         }
         .profile-info:hover .profile-dropdown,
         .profile-info.active .profile-dropdown {
-            opacity: 1;
-            visibility: visible;
+            opacity: 1; visibility: visible;
             transform: translateY(0);
             top: calc(100% + 10px);
         }
-        .profile-chevron {
-            transition: transform 0.3s ease;
-        }
+        .profile-chevron { transition: transform 0.3s ease; }
         .profile-info:hover .profile-chevron,
-        .profile-info.active .profile-chevron {
-            transform: rotate(180deg);
-        }
+        .profile-info.active .profile-chevron { transform: rotate(180deg); }
         .profile-dropdown .dropdown-item {
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 14px; font-weight: 500;
             transition: background-color 0.2s ease, color 0.2s ease;
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 10px 15px; border-radius: 8px;
         }
-        .profile-dropdown .dropdown-item:hover {
-            background-color: #f8fafc;
-            color: #dc3545 !important;
-        }
-        .dashboard-container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 15px;
-        }
+        .profile-dropdown .dropdown-item:hover { background-color: #f8fafc; color: #dc3545 !important; }
+        .dashboard-container { max-width: 900px; margin: 40px auto; padding: 0 15px; }
         .custom-card {
             background-color: #ffffff;
             border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             border: 1.5px solid #204e8a;
             padding: 30px 40px;
             margin-bottom: 30px;
         }
-
-        @media (max-width: 575.98px) {
-            .custom-card {
-                padding: 20px 15px;
-            }
-        }
+        @media (max-width: 575.98px) { .custom-card { padding: 20px 15px; } }
         .custom-card h3 {
-            color: #204e8a;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            color: #204e8a; font-size: 20px; font-weight: 700;
+            margin-bottom: 25px; padding-bottom: 15px;
             border-bottom: 1.5px solid #e2e8f0;
         }
         .form-label {
-            color: #204e8a;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            color: #204e8a; font-size: 13px; font-weight: 600;
+            margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-        .icon-input-wrapper {
-            position: relative;
+        .optional-badge {
+            font-size: 10px; font-weight: 500;
+            background: #e8f4fd; color: #5a9fd4;
+            padding: 2px 7px; border-radius: 20px;
+            text-transform: none; letter-spacing: 0;
+            vertical-align: middle; margin-left: 5px;
         }
+        .icon-input-wrapper { position: relative; }
         .icon-input-wrapper i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
+            position: absolute; left: 15px; top: 50%;
             transform: translateY(-50%);
-            color: #204e8a;
-            font-size: 14px;
+            color: #204e8a; font-size: 14px;
         }
         .icon-input-wrapper textarea ~ i,
-        .icon-input-wrapper i.fa-location-dot {
-            top: 20px;
-        }
+        .icon-input-wrapper i.fa-location-dot { top: 20px; }
         .icon-input-wrapper .form-control,
         .icon-input-wrapper .form-select {
-            padding-left: 45px;
-            font-size: 14px;
-            border-color: #cbd5e1;
-            border-radius: 8px;
+            padding-left: 45px; font-size: 14px;
+            border-color: #cbd5e1; border-radius: 8px;
             background-color: #f8fafc;
         }
         .icon-input-wrapper .form-control:focus,
         .icon-input-wrapper .form-select:focus {
             border-color: #204e8a;
-            box-shadow: 0 0 0 0.2rem rgba(32, 78, 138, 0.25);
+            box-shadow: 0 0 0 0.2rem rgba(32,78,138,0.25);
             background-color: #ffffff;
         }
         .btn-theme {
-            background-color: #3461a3;
-            color: #ffffff;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: none;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin-top: 10px;
+            background-color: #3461a3; color: #ffffff;
+            font-weight: 600; letter-spacing: 0.5px;
+            padding: 12px 20px; border-radius: 8px;
+            border: none; transition: all 0.3s ease;
+            width: 100%; margin-top: 10px;
         }
-        .btn-theme:hover {
-            background-color: #204e8a;
-            color: #ffffff;
-        }
-        .photo-section {
-            margin-bottom: 25px;
-        }
+        .btn-theme:hover { background-color: #204e8a; color: #ffffff; }
+        .photo-section { margin-bottom: 25px; }
         .upload-box {
             position: relative;
             border: 2px dashed #204e8a;
@@ -195,203 +144,111 @@
             transition: all 0.2s ease;
             text-align: center;
             min-height: 180px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             overflow: hidden;
         }
-        .upload-box:hover {
-            background-color: #f1f5f9;
-            border-color: #3461a3;
-        }
-        .upload-content {
-            padding: 30px;
-        }
-        .upload-icon-cloud {
-            color: #204e8a;
-            font-size: 3.5rem;
-            margin-bottom: 10px;
-        }
-        .upload-title {
-            color: #204e8a;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-        .upload-subtitle {
-            color: #6c757d;
-            font-size: 13px;
-        }
+        .upload-box:hover { background-color: #f1f5f9; border-color: #3461a3; }
+        .upload-content { padding: 30px; }
+        .upload-icon-cloud { color: #204e8a; font-size: 3.5rem; margin-bottom: 10px; }
+        .upload-title { color: #204e8a; font-size: 18px; font-weight: 600; margin-bottom: 5px; }
+        .upload-subtitle { color: #6c757d; font-size: 13px; }
         @media (max-width: 575.98px) {
-            .upload-icon-cloud {
-                font-size: 2.2rem;
-                margin-bottom: 5px;
-            }
-            .upload-title {
-                font-size: 15px;
-            }
-            .upload-subtitle {
-                font-size: 11px;
-            }
+            .upload-icon-cloud { font-size: 2.2rem; margin-bottom: 5px; }
+            .upload-title { font-size: 15px; }
+            .upload-subtitle { font-size: 11px; }
         }
         .doctor-file-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-            z-index: 2;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0; cursor: pointer; z-index: 2;
         }
         #crop-wrap {
-            display: none;
-            flex-direction: column;
+            display: none; flex-direction: column;
             align-items: center;
-            width: 100%;
-            padding: 20px 0 40px;
-            position: relative;
-            z-index: 5;
+            width: 100%; padding: 20px 0 40px;
+            position: relative; z-index: 5;
         }
-        #crop-container {
-            width: 100%;
-            max-width: 300px;
-            margin: 0 auto;
-        }
-        .croppie-container {
-            padding-bottom: 15px;
-        }
-        .cr-slider-wrap {
-            margin-bottom: 0 !important;
-            z-index: 10 !important;
-        }
+        #crop-container { width: 100%; max-width: 300px; margin: 0 auto; }
+        .croppie-container { padding-bottom: 15px; }
+        .cr-slider-wrap { margin-bottom: 0 !important; z-index: 10 !important; }
         #crop-btn {
             display: none;
-            background: #3461a3;
-            color: #fff;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
+            background: #3461a3; color: #fff;
+            border: none; padding: 10px 25px;
+            border-radius: 8px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: 0.3s;
             margin-top: 5px !important;
-            position: relative;
-            z-index: 10;
+            position: relative; z-index: 10;
         }
         #crop-btn:hover { background: #204e8a; }
         #crop-preview-wrap {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            padding: 20px 0;
-            z-index: 5;
-            position: relative;
+            display: none; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 15px; padding: 20px 0;
+            z-index: 5; position: relative;
         }
         #crop-preview {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #204e8a;
+            width: 120px; height: 120px; border-radius: 50%;
+            object-fit: cover; border: 3px solid #204e8a;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-        }
+        .action-buttons { display: flex; gap: 10px; }
         #recrop-btn {
-            background: #ffffff;
-            border: 1.5px solid #204e8a;
-            color: #204e8a;
-            padding: 8px 18px;
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
+            background: #ffffff; border: 1.5px solid #204e8a;
+            color: #204e8a; padding: 8px 18px; border-radius: 6px;
+            font-size: 13px; cursor: pointer; font-weight: 600; transition: 0.3s;
         }
         #recrop-btn:hover { background: #204e8a; color: #fff; }
         #discard-btn {
-            background: #ffffff;
-            border: 1.5px solid #dc3545;
-            color: #dc3545;
-            padding: 8px 18px;
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
+            background: #ffffff; border: 1.5px solid #dc3545;
+            color: #dc3545; padding: 8px 18px; border-radius: 6px;
+            font-size: 13px; cursor: pointer; font-weight: 600; transition: 0.3s;
         }
         #discard-btn:hover { background: #dc3545; color: #fff; }
         .dl-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s;
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 24px; border-radius: 8px;
+            font-size: 14px; font-weight: 600;
+            text-decoration: none; transition: all 0.2s;
         }
         .dl-banner { background: #eef2ff; color: #3730a3; border: 1.5px solid #c7d2fe; }
         .dl-banner:hover { background: #e0e7ff; color: #312e81; }
         .dl-video { background: #fffbeb; color: #92400e; border: 1.5px solid #fde68a; }
         .dl-video:hover { background: #fef3c7; color: #78350f; }
         label.error {
-            color: #dc3545;
-            font-size: 12px;
-            margin-top: 5px;
-            display: block;
-            font-weight: 500;
-            text-transform: none;
-            letter-spacing: normal;
+            color: #dc3545; font-size: 12px; margin-top: 5px;
+            display: block; font-weight: 500;
+            text-transform: none; letter-spacing: normal;
         }
         .form-control.error, .form-select.error { border-color: #dc3545; }
-        #cropped_image-error {
-            text-align: center;
-            margin-top: 10px;
-        }
+        #cropped_image-error { text-align: center; margin-top: 10px; }
 
-        .radio-card {
-            flex: 1;
-        }
+        /* ── RADIO CARDS ─────────────────────────────────── */
+        .radio-card { flex: 1; }
         .radio-label {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             padding: 12px 20px;
             background-color: #f8fafc;
             border: 1.5px solid #cbd5e1;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
+            border-radius: 8px; cursor: pointer;
+            font-size: 14px; font-weight: 500;
             color: #1a1a2e;
             transition: all 0.3s ease;
-            width: 100%;
-            margin: 0;
+            width: 100%; margin: 0;
         }
-        .radio-label i {
-            color: #204e8a;
-            transition: color 0.3s ease;
-        }
+        .radio-label i { color: #204e8a; transition: color 0.3s ease; }
         .radio-card input:checked + .radio-label {
-            background-color: #204e8a;
-            color: #ffffff;
+            background-color: #204e8a; color: #ffffff;
             border-color: #204e8a;
-            box-shadow: 0 4px 10px rgba(32, 78, 138, 0.2);
+            box-shadow: 0 4px 10px rgba(32,78,138,0.2);
         }
-        .radio-card input:checked + .radio-label i {
-            color: #ffffff;
-        }
-        .radio-label:hover {
-            border-color: #204e8a;
-            background-color: #ffffff;
+        .radio-card input:checked + .radio-label i { color: #ffffff; }
+        .radio-label:hover { border-color: #204e8a; background-color: #ffffff; }
+
+        /* ── VIDEO OPTIONS HIDDEN BY DEFAULT ─────────────── */
+        #video-options-english,
+        #video-options-hindi {
+            display: none;
         }
     </style>
 </head>
@@ -434,29 +291,30 @@
             <i class="fa-solid fa-circle-exclamation me-2"></i> {{ session('error') }}
         </div>
     @endif
-        @if(isset($poster) && $poster && $poster->banner_path)
-            <div class="alert mb-4 d-flex align-items-center gap-3"
-                 style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border: 1.5px solid #34d399; border-radius: 12px; padding: 16px 20px; font-size: 14px; color: #065f46; box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);"
-                 role="alert">
-                <div style="background: #10b981; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <i class="fa-solid fa-check" style="color: #ffffff; font-size: 16px;"></i>
-                </div>
-                <div>
-                    <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">
-                        Banner & Video Generated Successfully!
-                    </div>
-                    <div style="font-weight: 400; color: #047857;">
-                        Your files are ready. Scroll down to download your banner and video.
-                    </div>
-                </div>
-            </div>
-        @endif
 
-        <div class="custom-card">
+    @if(isset($poster) && $poster && $poster->banner_path)
+        <div class="alert mb-4 d-flex align-items-center gap-3"
+             style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border: 1.5px solid #34d399; border-radius: 12px; padding: 16px 20px; font-size: 14px; color: #065f46; box-shadow: 0 4px 15px rgba(52, 211, 153, 0.2);"
+             role="alert">
+            <div style="background: #10b981; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <i class="fa-solid fa-check" style="color: #ffffff; font-size: 16px;"></i>
+            </div>
+            <div>
+                <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">Banner & Video Generated Successfully!</div>
+                <div style="font-weight: 400; color: #047857;">Your files are ready. Scroll down to download your banner and video.</div>
+            </div>
+        </div>
+    @endif
+
+    <div class="custom-card">
         <h3><i class="fa-solid fa-pen-to-square me-2"></i> Create Poster</h3>
+
         <form id="dashboardForm" method="POST" action="{{ route('poster.store') }}" novalidate>
             @csrf
             <input type="hidden" name="cropped_image" id="cropped_image">
+            <input type="hidden" name="language" id="language_hidden" value="">
+
+            {{-- PREFIX --}}
             <div class="row mb-3">
                 <div class="col-md-12 mb-3 mb-md-0">
                     <label class="form-label" for="prefix">Prefix</label>
@@ -464,13 +322,12 @@
                         <i class="fa-solid fa-id-badge"></i>
                         <select name="prefix" id="prefix" class="form-select">
                             <option value="Dr." selected>Dr.</option>
-
                         </select>
                     </div>
                 </div>
-
             </div>
 
+            {{-- DOCTOR NAME + MSL CODE --}}
             <div class="row mb-3">
                 <div class="col-md-6 mb-3 mb-md-0">
                     <label class="form-label" for="name">Doctor Name</label>
@@ -480,60 +337,126 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label" for="msl">MSL Code</label>
+                    <label class="form-label" for="msl">
+                        MSL Code <span class="optional-badge">Optional</span>
+                    </label>
                     <div class="icon-input-wrapper">
                         <i class="fa-solid fa-hashtag"></i>
                         <input type="text" name="msl_code" id="msl" class="form-control" placeholder="Enter MSL Code" value="">
                     </div>
                 </div>
             </div>
+
+            {{-- DEGREE + PHONE --}}
             <div class="row mb-3">
                 <div class="col-md-6 mb-3 mb-md-0">
-                    <label class="form-label" for="degree">Degree</label>
+                    <label class="form-label" for="degree">
+                        Degree <span class="optional-badge">Optional</span>
+                    </label>
                     <div class="icon-input-wrapper">
                         <i class="fa-solid fa-user-graduate"></i>
                         <input type="text" name="degree" id="degree" class="form-control" placeholder="e.g. MBBS, MD" value="">
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label" for="phone">Phone</label>
+                    <label class="form-label" for="phone">
+                        Phone <span class="optional-badge">Optional</span>
+                    </label>
                     <div class="icon-input-wrapper">
                         <i class="fa-solid fa-phone"></i>
-                        <input type="text" name="phone" id="phone" class="form-control" placeholder="Phone Number" value="" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);">
+                        <input type="text" name="phone" id="phone" class="form-control"
+                               placeholder="Phone Number" value="" maxlength="10"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10);">
                     </div>
                 </div>
             </div>
+
+            {{-- ADDRESS --}}
             <div class="row mb-3">
                 <div class="col-12">
-                    <label class="form-label" for="address">Address</label>
+                    <label class="form-label" for="address">
+                        Address <span class="optional-badge">Optional</span>
+                    </label>
                     <div class="icon-input-wrapper">
                         <i class="fa-solid fa-location-dot"></i>
                         <textarea name="address" id="address" class="form-control" placeholder="Full address" rows="3"></textarea>
                     </div>
                 </div>
             </div>
-            <div class="row mb-4">
+
+            {{-- LANGUAGE --}}
+            <div class="row mb-3">
                 <div class="col-12">
+                    <label class="form-label" for="language_select">Language</label>
+                    <div class="icon-input-wrapper">
+                        <i class="fa-solid fa-language"></i>
+                        <select name="language_select" id="language_select" class="form-select">
+                            <option value="">— Select Language —</option>
+                            <option value="english">English</option>
+                            <option value="hindi">Hindi (हिन्दी)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {{-- VIDEO TYPE --}}
+            <div class="row mb-4" id="video-type-row" style="display: none;">
+
+            <div class="col-12">
                     <label class="form-label d-block mb-3">Video Type</label>
-                    <div class="d-flex gap-3">
+
+                    {{-- English options --}}
+                    <div id="video-options-english" class="gap-3">
                         <div class="radio-card">
-                            <input type="radio" name="video_type" id="bipolar1" value="Video1" class="d-none">
-                            <label for="bipolar1" class="radio-label">
-                                 Bipolar 1
-                            </label>
+                            <input type="radio" name="video_type" id="en_bipolar1" value="video1" class="d-none">
+                            <label for="en_bipolar1" class="radio-label">Bipolar 1</label>
                         </div>
                         <div class="radio-card">
-                            <input type="radio" name="video_type" id="bipolar2" value="Video2" class="d-none">
-                            <label for="bipolar2" class="radio-label">
-                                 Bipolar 2
-                            </label>
+                            <input type="radio" name="video_type" id="en_bipolar2" value="video2" class="d-none">
+                            <label for="en_bipolar2" class="radio-label">Bipolar 2</label>
                         </div>
                     </div>
+
+                    {{-- Hindi options --}}
+                    <div id="video-options-hindi" class="gap-3">
+                        <div class="radio-card">
+                            <input type="radio" name="video_type" id="hi_bipolar1" value="video1" class="d-none">
+                            <label for="hi_bipolar1" class="radio-label">Bipolar 1</label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="video_type" id="hi_bipolar2" value="video2" class="d-none">
+                            <label for="hi_bipolar2" class="radio-label">Bipolar 2</label>
+                        </div>
+                    </div>
+
                     <div id="video_type_error"></div>
                 </div>
             </div>
-            <div class="photo-section">
-                <label class="form-label">Upload Photo</label>
+
+            {{-- BANNER TYPE --}}
+            <div class="row mb-4">
+                <div class="col-12">
+                    <label class="form-label d-block mb-3">Banner Type</label>
+                    <div class="d-flex gap-3">
+                        <div class="radio-card">
+                            <input type="radio" name="banner_type" id="banner_with_photo" value="with_photo" class="d-none" checked>
+                            <label for="banner_with_photo" class="radio-label">
+                                <i class="fa-solid fa-user-check me-2"></i> With Photo
+                            </label>
+                        </div>
+                        <div class="radio-card">
+                            <input type="radio" name="banner_type" id="banner_without_photo" value="without_photo" class="d-none">
+                            <label for="banner_without_photo" class="radio-label">
+                                <i class="fa-solid fa-user-slash me-2"></i> Without Photo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{-- UPLOAD PHOTO --}}
+            <div class="photo-section" id="photo-section-wrapper">
+
+            <label class="form-label">Upload Photo</label>
                 <div class="upload-box" id="upload-box-wrapper">
                     <div class="upload-content text-center">
                         <i class="fa-solid fa-cloud-arrow-up upload-icon-cloud"></i>
@@ -554,11 +477,13 @@
                     </div>
                 </div>
             </div>
+
             <button type="submit" class="btn-theme">
                 Generate Banner & Video
             </button>
         </form>
     </div>
+
     @if(isset($poster) && $poster && $poster->banner_path)
         <div class="custom-card">
             <h3><i class="fa-solid fa-download me-2"></i> Download Files</h3>
@@ -583,61 +508,108 @@
 
 <script>
     $(document).ready(function () {
+
+        // ── PROFILE DROPDOWN ─────────────────────────────────────────
         $('.profile-info').on('click', function(e) {
-            if(window.innerWidth < 768) {
+            if (window.innerWidth < 768) {
                 e.stopPropagation();
                 $(this).toggleClass('active');
             }
         });
-        $(document).on('click', function() {
-            $('.profile-info').removeClass('active');
+        // ── BANNER TYPE TOGGLE ────────────────────────────────────────
+        $('input[name="banner_type"]').on('change', function () {
+            if ($(this).val() === 'without_photo') {
+                $('#photo-section-wrapper').hide();
+                // Clear any cropped image so validation doesn't block submit
+                $('#cropped_image').val('');
+                // Reset cropper state
+                originalImageSrc = null;
+                $('#upload').val('');
+                $('#upload').prop('disabled', false);
+                $('.doctor-file-input').css('pointer-events', 'auto');
+                $('#crop-preview-wrap').hide();
+                $('#crop-wrap').hide();
+                $('#crop-btn').hide();
+                $('.upload-content').show();
+            } else {
+                $('#photo-section-wrapper').show();
+            }
         });
-        $('.profile-dropdown').on('click', function(e) {
-            e.stopPropagation();
+        $(document).on('click', function() { $('.profile-info').removeClass('active'); });
+        $('.profile-dropdown').on('click', function(e) { e.stopPropagation(); });
+
+        // ── LANGUAGE SELECT ───────────────────────────────────────────
+        function showVideoOptions(lang) {
+            $('#video-options-english').hide();
+            $('#video-options-hindi').hide();
+            $('input[name="video_type"]').prop('checked', false);
+
+            if (lang === 'english') {
+                $('#video-type-row').show();
+                $('#video-options-english').css('display', 'flex');
+                $('#language_hidden').val('english');
+            } else if (lang === 'hindi') {
+                $('#video-type-row').show();
+                $('#video-options-hindi').css('display', 'flex');
+                $('#language_hidden').val('hindi');
+            } else {
+                $('#video-type-row').hide();
+                $('#language_hidden').val('');
+            }
+        }
+
+        // Run on change
+        $('#language_select').on('change', function () {
+            showVideoOptions($(this).val());
         });
+
+        // ── FORM VALIDATION ───────────────────────────────────────────
         $("#dashboardForm").validate({
             ignore: "",
             rules: {
-                name: { required: true },
-                msl_code: { required: true },
-                degree: { required: true },
-                phone: {
-                    required: true,
-                    digits: true,
-                    minlength: 10,
-                    maxlength: 10
+                name:            { required: true },
+                banner_type:            { required: true },
+                language_select: { required: true },
+                video_type: {
+                    required: {
+                        depends: function() {
+                            return $('#language_select').val() !== '';
+                        }
+                    }
                 },
-                address: { required: true },
-                video_type: { required: true },
-                cropped_image: { required: true }
-            },
+
+                cropped_image: {
+                    required: {
+                        depends: function() {
+                            return $('input[name="banner_type"]:checked').val() === 'with_photo';
+                        }
+                    }
+                }
+            },             // ← closes rules: {}
+
             messages: {
-                name: "Please enter the doctor's name",
-                msl_code: "Please enter the MSL code",
-                degree: "Please specify the degree",
-                phone: {
-                    required: "Please enter a phone number",
-                    digits: "Only numbers are allowed",
-                    minlength: "Phone number should be at least 10 digits",
-                    maxlength: "Phone number cannot exceed 10 digits"
-                },
-                address: "Please enter the full address",
-                video_type: "Please select a video type",
-                cropped_image: "Please upload and crop a photo"
+                name:            "Please enter the doctor's name",
+                language_select: "Please select a language",
+                video_type:      "Please select a video type",
+                banner_type:     "Please select a banner type",
+
+                cropped_image:   "Please upload and crop a photo"
             },
             errorPlacement: function(error, element) {
-                if(element.attr("name") == "cropped_image") {
+                if (element.attr("name") === "cropped_image") {
                     error.insertAfter("#upload-box-wrapper");
-                } else if(element.attr("name") == "video_type") {
-                    // Radio button ki error naye div me jayegi
+                } else if (element.attr("name") === "video_type") {
                     error.appendTo("#video_type_error");
                 } else {
                     error.insertAfter(element.closest(".icon-input-wrapper"));
                 }
             }
         });
+
+        // ── CROPPIE ───────────────────────────────────────────────────
         let cropper = null;
         let originalImageSrc = null;
+
         function initCropper(imageSrc) {
             $(".upload-content").hide();
             $("#crop-preview-wrap").hide();
@@ -650,19 +622,20 @@
             $("#crop-btn").show();
 
             let isMobile = window.innerWidth < 576;
-            let bWidth = isMobile ? 240 : 300;
+            let bWidth  = isMobile ? 240 : 300;
             let bHeight = isMobile ? 240 : 300;
-            let vWidth = isMobile ? 160 : 200;
+            let vWidth  = isMobile ? 160 : 200;
             let vHeight = isMobile ? 160 : 200;
 
             cropper = $("#crop-container").croppie({
-                viewport : { width: vWidth, height: vHeight, type: "circle" },
-                boundary : { width: bWidth, height: bHeight }
+                viewport: { width: vWidth, height: vHeight, type: "circle" },
+                boundary: { width: bWidth, height: bHeight }
             });
             cropper.croppie("bind", { url: imageSrc });
             $("#upload").prop("disabled", true);
             $(".doctor-file-input").css("pointer-events", "none");
         }
+
         $("#upload").on("change", function () {
             const file = this.files[0];
             if (!file) return;
@@ -674,29 +647,29 @@
             };
             reader.readAsDataURL(file);
         });
+
         $("#crop-btn").on("click", function (e) {
             e.preventDefault();
             if (!cropper) return;
             cropper.croppie("result", {
                 type: "base64",
-                size: { width: 800, height: 800 },  // ✅ viewport ki jagah HD size
+                size: { width: 800, height: 800 },
                 format: "png",
                 quality: 1
-            })
-                .then(function (base64) {
-                    $("#cropped_image").val(base64);
-                    $("#crop-wrap").hide();
-                    $("#crop-btn").hide();
-                    $("#crop-preview").attr("src", base64);
-                    $("#crop-preview-wrap").css("display", "flex");
-                    $("#dashboardForm").validate().element("#cropped_image");
-                });
+            }).then(function (base64) {
+                $("#cropped_image").val(base64);
+                $("#crop-wrap").hide();
+                $("#crop-btn").hide();
+                $("#crop-preview").attr("src", base64);
+                $("#crop-preview-wrap").css("display", "flex");
+                $("#dashboardForm").validate().element("#cropped_image");
+            });
         });
+
         $("#recrop-btn").on("click", function () {
-            if (originalImageSrc) {
-                initCropper(originalImageSrc);
-            }
+            if (originalImageSrc) initCropper(originalImageSrc);
         });
+
         $("#discard-btn").on("click", function () {
             originalImageSrc = null;
             $("#cropped_image").val("");
@@ -708,6 +681,7 @@
             $("#crop-btn").hide();
             $(".upload-content").show();
         });
+
     });
 </script>
 

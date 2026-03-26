@@ -3,13 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Exports\BannerExport;
-use App\Exports\DoctorExport;
 use App\Exports\EmployeeExport;
-use App\Models\Doctor;
 use App\Models\DoctorPoster;
 use App\Models\Employee;
 use Illuminate\Http\Request;
-use App\Imports\EmployeeImport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -104,6 +101,20 @@ class AdminController extends Controller
     public function banner_destroy($id)
     {
         $banner = DoctorPoster::findOrFail($id);
+
+        // Delete files from S3 bucket
+        if ($banner->photo && Storage::disk('s3')->exists($banner->photo)) {
+            Storage::disk('s3')->delete($banner->photo);
+        }
+
+        if ($banner->banner_path && Storage::disk('s3')->exists($banner->banner_path)) {
+            Storage::disk('s3')->delete($banner->banner_path);
+        }
+
+        if ($banner->video_path && Storage::disk('s3')->exists($banner->video_path)) {
+            Storage::disk('s3')->delete($banner->video_path);
+        }
+
         $banner->delete();
 
         return redirect()->route('admin.banner.index')

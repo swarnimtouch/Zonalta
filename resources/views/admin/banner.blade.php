@@ -53,6 +53,8 @@
                     <th class="th-doctor">Degree</th>
                     <th class="th-doctor">Mobile Number</th>
                     <th class="th-doctor">Address</th>
+                    <th class="th-doctor">Language</th>
+                    <th class="th-doctor">Banner Type</th>
                     <th class="th-employee ">Employee Name</th>
                     <th class="th-employee">Employee Code</th>
                     <th>Created</th>
@@ -97,11 +99,13 @@
                                 <span class="doc-name-text">{{ $banner->name }}</span>
                             </div>
                         </td>
-                        <td><span class="badge-mono">{{ $banner->msl_code }}</span></td>
+                        <td><span class="badge-mono">{{ $banner->msl_code ?? '—' }}</span></td>
 
-                        <td><span class="badge-mono">{{ $banner->degree }}</span></td>
+                        <td><span class="badge-mono">{{ $banner->degree ?? '—' }}</span></td>
                         <td class="text-muted-sm">{{ $banner->phone ?? '—' }}</td>
                         <td class="text-muted-sm">{{ $banner->address ?? '—' }}</td>
+                        <td class="text-muted-sm">{{ $banner->language ?? '—' }}</td>
+                        <td class="text-muted-sm">{{ $banner->banner_type ?? '—' }}</td>
                         <td style="font-weight:500;">{{ $banner->employee->name ?? '—' }}</td>
                         <td><span class="badge-mono emp">{{ $banner->employee->employee_code ?? '—' }}</span></td>
 
@@ -173,7 +177,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="11">
+                        <td colspan="12">
                             <div class="empty-state">
                                 <i class="fas fa-user-md"></i>
                                 <h5>No records found</h5>
@@ -300,6 +304,14 @@
                         <div class="m-field">
                             <div class="m-field-label"><i class="fas fa-map-marker-alt"></i> Address</div>
                             <div class="m-field-value {{ $banner->address ? '' : 'muted' }}">{{ $banner->address ?? 'Not set' }}</div>
+                        </div>
+                        <div class="m-field">
+                            <div class="m-field-label"><i class="fa-solid fa-language"></i> Language</div>
+                            <div class="m-field-value {{ $banner->language ? '' : 'muted' }}">{{ $banner->language ?? 'Not set' }}</div>
+                        </div>
+                        <div class="m-field">
+                            <div class="m-field-label"><i class="fa-solid fa-language"></i> Banner Type</div>
+                            <div class="m-field-value {{ $banner->banner_type ? '' : 'muted' }}">{{ $banner->banner_type ?? 'Not set' }}</div>
                         </div>
                         <div class="m-field">
                             <div class="m-field-label"><i class="fas fa-city"></i> Doctor Msl Code</div>

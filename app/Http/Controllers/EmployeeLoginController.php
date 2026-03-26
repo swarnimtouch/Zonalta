@@ -47,7 +47,6 @@ class EmployeeLoginController extends Controller
         $employee = Employee::findOrFail($employee_id);
 
         $poster = null;
-        // flash session se poster_id milega — sirf ek baar
         if (session('poster_id')) {
             $poster = DoctorPoster::find(session('poster_id'));
         }
@@ -55,13 +54,11 @@ class EmployeeLoginController extends Controller
         return view('employee.dashboard', compact('employee', 'poster'));
     }
 
-
     public function logout()
     {
         session()->forget(['employee_id', 'poster_id']);
         return redirect()->route('login');
     }
-
 
     public function storePoster(Request $request)
     {
@@ -73,9 +70,12 @@ class EmployeeLoginController extends Controller
 
         $request->validate([
             'name'       => 'required',
-            'phone'      => 'required',
-            'degree'     => 'required',
+            'phone'      => 'nullable',
+            'degree'     => 'nullable',
             'video_type' => 'required',
+            'language'   => 'required|in:english,hindi',
+            'banner_type' => 'required|in:with_photo,without_photo',
+
         ]);
 
         $employee      = Employee::findOrFail($employee_id);
@@ -86,7 +86,7 @@ class EmployeeLoginController extends Controller
         $photoPath   = null;
         $photoS3Path = null;
 
-        if ($request->cropped_image) {
+        if ($request->banner_type === 'with_photo' && $request->cropped_image) {
             $localPhotoFolder = $this->makeLocalTempPath('photos');
             $imageName        = $doctorName . '_photo.png';
             $localPhotoFull   = $localPhotoFolder . '/' . $imageName;
@@ -101,6 +101,7 @@ class EmployeeLoginController extends Controller
             $photoS3Path = $s3PhotoKey;
             $photoPath   = $localPhotoFull;
         }
+        $bannerType = str_replace('_', ' ', $request->banner_type);
 
         [$bannerLocalPath, $bannerS3Path] = $this->generateBanner(
             $request,
@@ -111,6 +112,7 @@ class EmployeeLoginController extends Controller
 
         [$videoLocalPath, $videoS3Path] = $this->generateVideo(
             $request->video_type,
+            $request->language,
             $bannerLocalPath,
             $employee_id,
             $doctorName
@@ -121,7 +123,6 @@ class EmployeeLoginController extends Controller
         if ($photoPath) {
             @unlink($photoPath);
         }
-
         $poster = DoctorPoster::create([
             'employee_id' => $employee_id,
             'prefix'      => $request->prefix,
@@ -130,13 +131,14 @@ class EmployeeLoginController extends Controller
             'degree'      => $request->degree,
             'phone'       => $request->phone,
             'address'     => $request->address,
+            'language'    => $request->language,
+            'banner_type' => $bannerType,
             'photo'       => $photoS3Path,
             'banner_path' => $bannerS3Path,
             'video_path'  => $videoS3Path,
         ]);
 
         session()->flash('poster_id', $poster->id);
-
 
         return redirect()->route('dashboard');
     }
@@ -163,11 +165,11 @@ class EmployeeLoginController extends Controller
         $bannerName     = $doctorName . '_banner.jpg';
         $bannerFullPath = $folder . '/' . $bannerName;
 
-        // Load background (1080x1080)
-        $background = imagecreatefromjpeg(public_path('uploads/base_banner/background.jpg'));
+        $bannerType  = $request->banner_type ?? 'with_photo';
+        $bgFile      = ($bannerType === 'without_photo') ? 'background_no_photo.jpg' : 'background.jpg';
+        $background  = imagecreatefromjpeg(public_path("uploads/base_banner/{$bgFile}"));
 
-        // ── PHOTO (circle crop) ──────────────────────────────────────────
-        // From transform panel: X=291, Y=174, W=502, H=502
+
         if ($photoLocalPath && file_exists($photoLocalPath)) {
 
             $photo = imagecreatefromstring(file_get_contents($photoLocalPath));
@@ -178,7 +180,6 @@ class EmployeeLoginController extends Controller
             $destX = 291;
             $destY = 174;
 
-            // ✅ Step 1: Photo ko square crop karo (center se) — aspect ratio preserve
             $squareSize = min($srcW, $srcH);
             $cropX      = (int)(($srcW - $squareSize) / 2);
             $cropY      = (int)(($srcH - $squareSize) / 2);
@@ -193,7 +194,6 @@ class EmployeeLoginController extends Controller
             );
             imagedestroy($photo);
 
-            // ✅ Step 2: Circle mask — imagecopyresampled se sharp image pe apply karo
             $circle = imagecreatetruecolor($size, $size);
             imagealphablending($circle, false);
             imagesavealpha($circle, true);
@@ -211,21 +211,19 @@ class EmployeeLoginController extends Controller
             }
             imagedestroy($squared);
 
-            // ✅ Step 3: Background pe paste karo
             imagealphablending($background, true);
             imagecopy($background, $circle, $destX, $destY, 0, 0, $size, $size);
             imagedestroy($circle);
         }
 
-        // ── TEXT ─────────────────────────────────────────────────────────
-        $blue     = imagecolorallocate($background, 8, 85, 165); // #0855a5
+
+        $blue     = imagecolorallocate($background, 8, 85, 165);
         $fontBold = public_path('fonts/Baskervville-SemiBold.ttf');
         $fontReg  = public_path('fonts/Baskervville-Regular.ttf');
 
         $startX = 0;
         $endX   = 1080;
 
-        // Helper: center text horizontally between startX and endX
         $centerText = function($bg, $size, $angle, $font, $text, $y) use ($startX, $endX, $blue) {
             $box = imagettfbbox($size, $angle, $font, $text);
             $tw  = abs($box[2] - $box[0]);
@@ -233,60 +231,63 @@ class EmployeeLoginController extends Controller
             imagettftext($bg, $size, $angle, (int)$x, $y, $blue, $font, $text);
         };
 
-        // NAME — SemiBold, centered, Y=2205
+        // ── NAME (always shown) ──────────────────────────────────────────
         $fullName = trim(($request->prefix ? $request->prefix . ' ' : '') . $request->name);
-        $nameY = 770;
-        $centerText($background, 36, 0, $fontBold, $fullName, $nameY);
+        $currentY = 770;
+        $centerText($background, 36, 0, $fontBold, $fullName, $currentY);
+        $currentY += 55;
 
+        // ── DEGREE (optional) ────────────────────────────────────────────
+        if (!empty($request->degree)) {
+            $centerText($background, 24, 0, $fontReg, $request->degree, $currentY);
+            $currentY += 50;
+        }
 
-        // DEGREE — Regular, below name
-        $degreeY = $nameY + 55;
-        $centerText($background, 24, 0, $fontReg, $request->degree, $degreeY);
+        // ── ADDRESS (optional) ───────────────────────────────────────────
+        if (!empty($request->address)) {
+            $address  = $request->address;
+            $maxChars = 35;
+            $words    = explode(' ', $address);
+            $lines    = [];
+            $line     = '';
 
-
-
-        // ADDRESS — conditional line wrapping (max 3 lines)
-        $address  = $request->address ?? '';
-        $maxChars = 35;
-        $words    = explode(' ', $address);
-        $lines    = [];
-        $line     = '';
-
-        foreach ($words as $word) {
-            $test = $line === '' ? $word : $line . ' ' . $word;
-            if (strlen($test) > $maxChars && $line !== '') {
-                $lines[] = $line;
-                $line    = $word;
-            } else {
-                $line = $test;
+            foreach ($words as $word) {
+                $test = $line === '' ? $word : $line . ' ' . $word;
+                if (strlen($test) > $maxChars && $line !== '') {
+                    $lines[] = $line;
+                    $line    = $word;
+                } else {
+                    $line = $test;
+                }
             }
+            if ($line !== '') $lines[] = $line;
+
+            if (count($lines) > 3) {
+                $lines    = array_slice($lines, 0, 3);
+                $lines[2] .= '...';
+            }
+
+            $addrFontSize = 20;
+            $addrLineH    = 36;
+
+            foreach ($lines as $i => $addrLine) {
+                $centerText(
+                    $background,
+                    $addrFontSize,
+                    0,
+                    $fontReg,
+                    $addrLine,
+                    $currentY + ($i * $addrLineH)
+                );
+            }
+            $currentY += (count($lines) * $addrLineH) + 15;
         }
-        if ($line !== '') $lines[] = $line;
 
-        // Cap at 3 lines, truncate with '...' if exceeded
-        if (count($lines) > 3) {
-            $lines    = array_slice($lines, 0, 3);
-            $lines[2] .= '...';
+        // ── PHONE (optional) ─────────────────────────────────────────────
+        if (!empty($request->phone)) {
+            $centerText($background, 24, 0, $fontReg, $request->phone, $currentY);
         }
 
-        $addrFontSize = 20;
-        $addrLineH    = 36;
-        $addrStartY   = $degreeY+ 50;
-
-        foreach ($lines as $i => $addrLine) {
-            $centerText(
-                $background,
-                $addrFontSize,
-                0,
-                $fontReg,
-                $addrLine,
-                $addrStartY + ($i * $addrLineH)
-            );
-        }
-        // PHONE — Regular, below degree
-        $phoneY = $addrStartY + (count($lines) * $addrLineH) + 15;
-
-        $centerText($background, 24, 0, $fontReg, $request->phone, $phoneY);
         // ── SAVE & UPLOAD ─────────────────────────────────────────────────
         imagejpeg($background, $bannerFullPath, 90);
         imagedestroy($background);
@@ -298,30 +299,46 @@ class EmployeeLoginController extends Controller
         return [$bannerFullPath, $s3Key];
     }
 
-
-    private function generateVideo($videoType, $bannerLocalPath, $employee_id, $doctorName)
+    private function generateVideo($videoType, $language, $bannerLocalPath, $employee_id, $doctorName)
     {
         $employee = Employee::findOrFail($employee_id);
 
         $folder    = $this->makeLocalTempPath('videos');
         $videoType = strtolower(trim($videoType));
+        $language  = strtolower(trim($language));
 
+        // ── VIDEO MAP: language → video_type → filename ──────────────────
+        // English videos folder: public/uploads/base_videos/english/
+        // Hindi videos folder:   public/uploads/base_videos/hindi/
         $videoMap = [
-            'video1' => 'Video1.mp4',
-            'video2' => 'Video2.mp4',
+            'english' => [
+                'video1' => 'Video1.mp4',
+                'video2' => 'Video2.mp4',
+            ],
+            'hindi' => [
+                'video1' => 'HindiVideo1.mp4',
+                'video2' => 'HindiVideo2.mp4',
+            ],
         ];
 
-// default fallback = Video1
-        $videoFile = $videoMap[$videoType] ?? 'Video1.mp4';
+        $langVideos = $videoMap[$language] ?? $videoMap['english'];
+        $videoFile  = $langVideos[$videoType] ?? 'Video1.mp4';
 
-        $baseVideo = public_path('uploads/base_videos/' . $videoFile);
+        // Store language-specific videos in subfolders:
+        // public/uploads/base_videos/english/Video1.mp4
+        // public/uploads/base_videos/hindi/HindiVideo1.mp4
+        $baseVideo = public_path("uploads/base_videos/{$language}/{$videoFile}");
+
+        // Fallback to root folder if subfolder not found
+        if (!file_exists($baseVideo)) {
+            $baseVideo = public_path("uploads/base_videos/{$videoFile}");
+        }
 
         $finalName   = $doctorName . '_video.mp4';
         $finalPath   = $folder . '/' . $finalName;
         $bannerVideo = $folder . '/' . $doctorName . '_banner_clip.mp4';
         $concatList  = $folder . '/' . $doctorName . '_concat.txt';
 
-        // Base video ka size/fps/audio detect karo
         $sizeOut   = trim(shell_exec("ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=p=0 \"{$baseVideo}\" 2>&1"));
         $sizeParts = explode(',', $sizeOut);
         $vw = isset($sizeParts[0]) && (int)$sizeParts[0] > 0 ? (int)$sizeParts[0] : 1080;
@@ -334,8 +351,6 @@ class EmployeeLoginController extends Controller
         $arRaw = trim(shell_exec("ffprobe -v error -select_streams a:0 -show_entries stream=sample_rate -of default=noprint_wrappers=1:nokey=1 \"{$baseVideo}\" 2>&1"));
         $ar    = (is_numeric($arRaw) && (int)$arRaw > 0) ? (int)$arRaw : 44100;
 
-        // ✅ FIX 1: pix_fmt yuv420p add kiya — base video se match karega
-        // ✅ FIX 2: audio ko -ar se sample rate explicitly set kiya
         $cmd1 = "ffmpeg -y "
             . "-loop 1 -t 10 -i \"{$bannerLocalPath}\" "
             . "-f lavfi -t 10 -i \"anullsrc=channel_layout=stereo:sample_rate={$ar}\" "
@@ -349,8 +364,6 @@ class EmployeeLoginController extends Controller
 
         exec($cmd1, $out1, $rc1);
 
-
-
         if ($rc1 !== 0 || !file_exists($bannerVideo) || filesize($bannerVideo) === 0) {
             \Log::error('ffmpeg step1 failed', ['cmd' => $cmd1, 'output' => $out1]);
             abort(500, 'Banner clip generation failed');
@@ -361,17 +374,13 @@ class EmployeeLoginController extends Controller
             "file '" . str_replace("'", "'\\''", $bannerVideo) . "'\n"
         );
 
-        // ✅ FIX 3: -c copy ki jagah re-encode — codec/format mismatch resolve hoga
         $cmd2 = "ffmpeg -y "
             . "-f concat -safe 0 -i \"{$concatList}\" "
-            . "-c copy "                // ✅ zero re-encoding
+            . "-c copy "
             . "-movflags +faststart "
             . "\"{$finalPath}\" 2>&1";
 
-
         exec($cmd2, $out2, $rc2);
-
-
 
         @unlink($bannerVideo);
         @unlink($concatList);
